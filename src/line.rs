@@ -85,12 +85,13 @@ impl ParsecLine {
 
     fn parse(self) -> ParsedParsecLine {
         let radius = Distance::from_cm(10f64.powf(self.log_r));
+        const SOLAR_RADIUS: Distance<f64> = Distance { m: 6.957e8 };
         ParsedParsecLine {
             mass_in_solar_masses: self.mass,
             age_in_years: self.age,
             luminous_intensity_in_solar: 10f64.powf(self.log_l),
             temperature_in_kelvin: 10f64.powf(self.log_te),
-            radius_in_solar_radii: distance_to_sun_radii(&radius),
+            radius_in_solar_radii: radius / SOLAR_RADIUS,
         }
     }
 }

@@ -9,6 +9,8 @@ use tar::Archive;
 
 use crate::data::ParsecData;
 use crate::error::ParsecAccessError;
+use crate::line::ParsecLine;
+use crate::trajectory::Trajectory;
 
 impl ParsecData {
     const METALLICITY: &'static str = "Z0.01";
