@@ -1,0 +1,13 @@
+[package]
+authors = ["The Comamba <thecomamba@jojoheinze.de>"]
+categories = ["database", "science"]
+description = "Access the PARSEC database for stellar evolutionary trajectories."
+edition = "2021"
+keywords = ["parsec", "astronomy"]
+license = "MIT"
+name = "parsec_access"
+readme = "README.md"
+repository = "https://github.com/TheComamba/ParsecAccess"
+version = "0.1.0"
+
+[dependencies]
