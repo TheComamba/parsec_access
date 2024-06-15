@@ -1,5 +1,6 @@
 
 from bs4 import BeautifulSoup
+import glob
 import os
 import requests
 import tarfile
@@ -32,18 +33,30 @@ def assure_archive_downloaded(archive_name):
 
 def assure_extracted(archive_name):
     archive_path = f'dev_data/{archive_name}'
-    extract_dir = archive_path.replace('.tar.gz', '')
+    extract_dir = 'dev_data'
 
-    if not os.path.exists(extract_dir):
+    target_path = extract_dir + '/' + archive_name.replace('.tar.gz', '')
+    if not os.path.exists(target_path):
         with tarfile.open(archive_path, 'r:gz') as tar:
             print(f'Extracting {archive_path}...')
             tar.extractall(path=extract_dir)
 
+def delete_obsolete_files(archive_name):
+    dir_name = 'dev_data/' + archive_name.replace('.tar.gz', '')
+    files = glob.glob(os.path.join(dir_name, '*.HB.DAT'))
+    for file in files:
+        os.remove(file)
+    files = glob.glob(os.path.join(dir_name, '*ADD.DAT'))
+    for file in files:
+        os.remove(file)
+
 def main():
     assure_dev_data_folder()
     archive_names = collect_archive_names()
+    archive_names.sort()
     for archive_name in archive_names:
         assure_archive_downloaded(archive_name)
         assure_extracted(archive_name)
+        delete_obsolete_files(archive_name)
 
 main()
