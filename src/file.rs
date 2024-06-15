@@ -7,6 +7,7 @@ use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::path::PathBuf;
 use tar::Archive;
 
+use crate::data::ParsecData;
 use crate::error::ParsecAccessError;
 
 impl ParsecData {

@@ -2,3 +2,4 @@
 
 pub mod error;
 pub(crate) mod file;
+pub(crate) mod data;
