@@ -1,6 +1,7 @@
 
 from bs4 import BeautifulSoup # Pulling data out of HTML and XML files
 import glob # Unix style pathname pattern expansion
+import math
 import os
 import re # Regular Expressions
 import requests
@@ -36,7 +37,26 @@ impl Metallicity {{
         }}
     }}
 
-    fn to_dex(self) -> f32 {{
+    /// Converts the metallicity to units of dex for the element iron, using several assumptions.
+    ///
+    /// PARSEC lists metallicity as
+    /// Z = m_M / m_tot ,
+    /// the mass fraction of all metals (i.e. elements heavier than Helium) in the star.
+    ///
+    /// The chemical abundance ratio on the other hand is conventionally given as
+    /// [Fe/H] = log10(N_Fe / N_H) - log10(N_Fe / N_H)_sun ,
+    /// where N_Fe and N_H are the number densities of iron and hydrogen atoms, respectively.
+    ///
+    /// Assuming that iron always makes up more or less the same fraction of the total mass,
+    /// N_Fe = a * m_M
+    /// and that the total mass is dominated by hydrogen,
+    /// N_H = m_tot ,
+    /// we find
+    /// [Fe/H] = log10(a * m_M / m_tot) - log10(a * m_M / m_tot)_sun
+    ///        = log10(Z / Z_sun) .
+    ///
+    /// The solar metallicity is Z_sun = 0.0122.
+    fn to_fe_dex(self) -> f32 {{
         match self {{
             {metallicity_to_dex}
         }}
@@ -137,22 +157,25 @@ def generate_mod_file():
         f.write(MOD_TEMPLATE)
 
 def mass_fraction_to_dex(mass_fraction):
-    
+    Z_sun = 0.0122
+    return math.log10(mass_fraction / Z_sun)
 
 def generate_metallicity_file(metallicities, metallicity_to_archive_name):
     enum_str = ""
     to_archive_str = ""
     to_mass_fraction_str = ""
-    to_dex_str = "todo!()"
+    to_dex_str = ""
     for metallicity in metallicities:
         enum_comment = "/// Metallic mass fraction Z = " + metallicity
         variant_name = "Z" + metallicity.replace(".", "p")
         archive_name = metallicity_to_archive_name[metallicity]
         mass_fraction = float(metallicity)
+        dex = mass_fraction_to_dex(mass_fraction)
 
         enum_str += f"{enum_comment}\n{variant_name},\n"
         to_archive_str += f"Metallicity::{variant_name} => \"{archive_name}\",\n"
         to_mass_fraction_str += f"Metallicity::{variant_name} => {mass_fraction},\n"
+        to_dex_str += f"Metallicity::{variant_name} => {dex},\n"
     
     with open(target_dir + "metallicity.rs", 'w') as f:
         f.write(METALLICITY_TEMPLATE.format(metallicities=enum_str, metallicity_to_archive_name=to_archive_str, metallicity_to_mass_fraction=to_mass_fraction_str, metallicity_to_dex=to_dex_str))
