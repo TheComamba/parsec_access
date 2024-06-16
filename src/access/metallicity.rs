@@ -4,6 +4,7 @@
 
 /// Enum for the available metallicities.
 /// The naming convention is Z followed by the metallicity in mass fraction, with the decimal point replaced by an underscore.
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Metallicity {
     /// Metallic mass fraction Z = 0.0001
     Z0_0001,
@@ -40,14 +41,6 @@ pub enum Metallicity {
 impl Metallicity {
     /// Returns the name of the archive file for the metallicity.
     /// Using this, the crate knows which file to download during intialisation.
-    ///
-    /// # Example
-    /// ```
-    /// use parsec_access::access::metallicity::Metallicity;
-    ///
-    /// let archive_name = Metallicity::Z0_0001.to_archive_name();
-    /// assert_eq!(archive_name, "Z0.0001Y0.249.tar.gz");
-    /// ```
     fn to_archive_name(&self) -> &str {
         match self {
             Metallicity::Z0_0001 => "Z0.0001Y0.249.tar.gz",
@@ -75,7 +68,7 @@ impl Metallicity {
     /// use parsec_access::access::metallicity::Metallicity;
     ///
     /// let mass_fraction = Metallicity::Z0_0100.to_mass_fraction();
-    /// assert!((mass_fraction - 0.01).abs < 1e-10);
+    /// assert!((mass_fraction - 0.01).abs() < 1e-10);
     /// ```
     pub fn to_mass_fraction(&self) -> f32 {
         match self {
@@ -184,7 +177,7 @@ impl Metallicity {
     /// use parsec_access::access::metallicity::Metallicity;
     ///
     /// let dex = Metallicity::Z0_0100.to_fe_dex();
-    /// assert!((dex + 0.086).abs < 1e-3);
+    /// assert!((dex + 0.086).abs() < 1e-3);
     /// ```
     pub fn to_fe_dex(self) -> f32 {
         match self {
@@ -216,11 +209,11 @@ impl Metallicity {
     /// use parsec_access::access::metallicity::Metallicity;
     ///
     /// let closest = Metallicity::find_closest_from_fe_dex(0.);
-    /// assert_eq!(closest, Metallicity::Z0_0100);
+    /// assert_eq!(closest, Metallicity::Z0_0140, "The sun should have a metallicity of roughlty Z = 0.0122. The test found {}", closest.to_mass_fraction());
     /// let closest = Metallicity::find_closest_from_fe_dex(-10.);
-    /// assert_eq!(closest, Metallicity::Z0_0001);
+    /// assert_eq!(closest, Metallicity::Z0_0001, "The lowest metallicity should be Z = 0.0001. The test found {}", closest.to_mass_fraction());
     /// let closest = Metallicity::find_closest_from_fe_dex(10.);
-    /// assert_eq!(closest, Metallicity::Z0_0600);
+    /// assert_eq!(closest, Metallicity::Z0_0600, "The highest metallicity should be Z = 0.06. The test found {}", closest.to_mass_fraction());
     /// ```
     pub fn find_closest_from_fe_dex(fe_dex: f32) -> Metallicity {
         if fe_dex < -1.9358448328427578 {
