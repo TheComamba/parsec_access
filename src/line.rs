@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use simple_si_units::base::Distance;
 
-use crate::{data::ParsecData, error::ParsecAccessError};
+use crate::error::ParsecAccessError;
 
 pub(super) struct ParsecLine {
     mass: f64,
@@ -20,30 +20,18 @@ pub(crate) struct ParsedParsecLine {
     pub(super) radius_in_solar_radii: f64,
 }
 
-impl ParsecLine {
+impl ParsedParsecLine {
     const MASS_INDEX: usize = 1;
     const AGE_INDEX: usize = 2;
     const LOG_L_INDEX: usize = 3;
     const LOG_TE_INDEX: usize = 4;
     const LOG_R_INDEX: usize = 5;
 
-    pub(super) fn read(
-        line: Result<String, std::io::Error>,
-        mass_position: &mut Option<usize>,
-        lines: &mut Vec<ParsedParsecLine>,
-    ) -> Result<(), ParsecAccessError> {
-        let line = line.map_err(ParsecAccessError::Io)?;
+    pub(super) fn read(line: String) -> Result<Self, ParsecAccessError> {
         let entries: Vec<&str> = line.split_whitespace().collect();
         let mass_entry = entries
             .get(Self::MASS_INDEX)
             .ok_or(ParsecAccessError::DataNotAvailable("mass".to_string()))?;
-        if mass_position.is_none() {
-            if let Ok(mass_value) = mass_entry.parse::<f64>() {
-                *mass_position = Some(ParsecData::get_closest_mass_index(mass_value));
-            } else {
-                return Ok(());
-            }
-        }
 
         let age_entry = entries
             .get(Self::AGE_INDEX)
@@ -73,16 +61,16 @@ impl ParsecLine {
             }
             .parse();
 
-            lines.push(parsec_line);
+            Ok(parsec_line)
         } else {
-            return Err(ParsecAccessError::DataNotAvailable(
+            Err(ParsecAccessError::DataNotAvailable(
                 "[Parsing failed]".to_string(),
-            ));
+            ))
         }
-
-        Ok(())
     }
+}
 
+impl ParsecLine {
     fn parse(self) -> ParsedParsecLine {
         let radius = Distance::from_cm(10f64.powf(self.log_r));
         const SOLAR_RADIUS: Distance<f64> = Distance { m: 6.957e8 };

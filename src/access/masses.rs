@@ -1762,7 +1762,7 @@ pub fn get_masses(metallicity: &Metallicity) -> &[f64] {
 
 /// Returns a reference to the sorted array of filenames available for the given metallicity.
 /// The files have the same order as the masses, and can thus be accessed via index.
-fn get_filenames(metallicity: &Metallicity) -> &[&str] {
+pub(crate) fn get_filenames(metallicity: &Metallicity) -> &[&str] {
     match metallicity {
         Metallicity::Z0_0001 => &Z0_0001_FILENAMES,
         Metallicity::Z0_0002 => &Z0_0002_FILENAMES,
