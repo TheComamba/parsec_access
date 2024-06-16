@@ -13,9 +13,7 @@ impl ParsecData {
                 max_index = mid_index;
             }
         }
-        if (mass - list[min_index]).abs()
-            < (mass - list[max_index]).abs()
-        {
+        if (mass - list[min_index]).abs() < (mass - list[max_index]).abs() {
             min_index
         } else {
             max_index

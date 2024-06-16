@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use simple_si_units::base::Distance;
 
-use crate::{access::data::ParsecData, error::ParsecAccessError};
+use crate::error::ParsecAccessError;
 
 pub(super) struct ParsecLine {
     mass: f64,
@@ -29,7 +29,6 @@ impl ParsecLine {
 
     pub(super) fn read(
         line: Result<String, std::io::Error>,
-        mass_position: &mut Option<usize>,
         lines: &mut Vec<ParsedParsecLine>,
     ) -> Result<(), ParsecAccessError> {
         let line = line.map_err(ParsecAccessError::Io)?;
@@ -37,13 +36,6 @@ impl ParsecLine {
         let mass_entry = entries
             .get(Self::MASS_INDEX)
             .ok_or(ParsecAccessError::DataNotAvailable("mass".to_string()))?;
-        if mass_position.is_none() {
-            if let Ok(mass_value) = mass_entry.parse::<f64>() {
-                *mass_position = Some(ParsecData::get_closest_mass_index(mass_value));
-            } else {
-                return Ok(());
-            }
-        }
 
         let age_entry = entries
             .get(Self::AGE_INDEX)
