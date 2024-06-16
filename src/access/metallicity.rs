@@ -3,6 +3,7 @@
 //! Provides an enum for the available metallicities and several helper functions.
 
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 /// Enum for the available metallicities.
 /// The naming convention is Z followed by the metallicity in mass fraction, with the decimal point replaced by an underscore.
@@ -38,6 +39,28 @@ pub enum Metallicity {
     Z0_0400,
     /// Metallic mass fraction Z = 0.0600
     Z0_0600,
+}
+
+impl fmt::Display for Metallicity {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Metallicity::Z0_0001 => write!(f, "Z0_0001"),
+            Metallicity::Z0_0002 => write!(f, "Z0_0002"),
+            Metallicity::Z0_0005 => write!(f, "Z0_0005"),
+            Metallicity::Z0_0010 => write!(f, "Z0_0010"),
+            Metallicity::Z0_0020 => write!(f, "Z0_0020"),
+            Metallicity::Z0_0040 => write!(f, "Z0_0040"),
+            Metallicity::Z0_0060 => write!(f, "Z0_0060"),
+            Metallicity::Z0_0080 => write!(f, "Z0_0080"),
+            Metallicity::Z0_0100 => write!(f, "Z0_0100"),
+            Metallicity::Z0_0140 => write!(f, "Z0_0140"),
+            Metallicity::Z0_0170 => write!(f, "Z0_0170"),
+            Metallicity::Z0_0200 => write!(f, "Z0_0200"),
+            Metallicity::Z0_0300 => write!(f, "Z0_0300"),
+            Metallicity::Z0_0400 => write!(f, "Z0_0400"),
+            Metallicity::Z0_0600 => write!(f, "Z0_0600"),
+        }
+    }
 }
 
 impl Metallicity {

@@ -106,12 +106,21 @@ METALLICITY_TEMPLATE = """
 //! Provides an enum for the available metallicities and several helper functions.
 
 use serde::{{Deserialize, Serialize}};
+use std::fmt;
 
 /// Enum for the available metallicities.
 /// The naming convention is Z followed by the metallicity in mass fraction, with the decimal point replaced by an underscore.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub enum Metallicity {{
-{metallicities}
+    {metallicities}
+}}
+
+impl fmt::Display for Metallicity {{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {{
+        match *self {{
+            {display_impl}
+        }}
+    }}
 }}
 
 impl Metallicity {{
@@ -372,6 +381,7 @@ def metallicity_variant_name(metallicity):
 
 def generate_metallicity_file(metallicities, metallicity_to_archive_name):
     enum_str = ""
+    display_impl = ""
     to_archive_str = ""
     to_mass_fraction_str = ""
     to_dex_str = ""
@@ -387,6 +397,7 @@ def generate_metallicity_file(metallicities, metallicity_to_archive_name):
         metallicity_and_dex.append((f"Metallicity::{variant_name}", dex))
 
         enum_str += f"{enum_comment}\n{variant_name},\n"
+        display_impl += f"Metallicity::{variant_name} => write!(f, \"{variant_name}\"),\n"
         to_archive_str += f"Metallicity::{variant_name} => \"{archive_name}\",\n"
         to_mass_fraction_str += f"Metallicity::{variant_name} => {mass_fraction},\n"
         to_dex_str += f"Metallicity::{variant_name} => {dex},\n"
@@ -395,6 +406,7 @@ def generate_metallicity_file(metallicities, metallicity_to_archive_name):
 
     with open(TARGET_DIR + "metallicity.rs", 'w') as f:
         f.write(METALLICITY_TEMPLATE.format(metallicities=enum_str,
+                                            display_impl=display_impl,
                                             metallicity_to_archive_name=to_archive_str,
                                             metallicity_to_mass_fraction=to_mass_fraction_str,
                                             find_closest_mass_fraction=find_closest_mass_fraction,
