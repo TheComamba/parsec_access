@@ -16,6 +16,8 @@ MOD_TEMPLATE = """
 
 //! Provides access to an enum for the available metallicities, arrays of masses for each metallicity, and several helper functions.
 
+pub(crate) const PARSEC_URL: &str = "{URL}";
+
 pub(crate) mod data;
 pub mod metallicity;
 pub mod masses;
@@ -126,7 +128,7 @@ impl fmt::Display for Metallicity {{
 impl Metallicity {{
     /// Returns the name of the archive file for the metallicity.
     /// Using this, the crate knows which file to download during intialisation.
-    fn to_archive_name(&self) -> &str {{
+    pub(crate) fn to_archive_name(&self) -> &str {{
         match self {{
             {metallicity_to_archive_name}
         }}
@@ -339,7 +341,7 @@ def clean_target_dir():
 
 def generate_mod_file():
     with open(TARGET_DIR + "mod.rs", 'w') as f:
-        f.write(MOD_TEMPLATE)
+        f.write(MOD_TEMPLATE.format(URL=URL))
 
 def generate_data_file(metallicities):
     static_data = ""

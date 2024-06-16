@@ -66,7 +66,7 @@ impl fmt::Display for Metallicity {
 impl Metallicity {
     /// Returns the name of the archive file for the metallicity.
     /// Using this, the crate knows which file to download during intialisation.
-    fn to_archive_name(&self) -> &str {
+    pub(crate) fn to_archive_name(&self) -> &str {
         match self {
             Metallicity::Z0_0001 => "Z0.0001Y0.249.tar.gz",
             Metallicity::Z0_0002 => "Z0.0002Y0.249.tar.gz",

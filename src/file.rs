@@ -9,18 +9,16 @@ use tar::Archive;
 
 use crate::access::data::ParsecData;
 use crate::access::metallicity::Metallicity;
+use crate::access::PARSEC_URL;
 use crate::error::ParsecAccessError;
 use crate::line::ParsecLine;
 use crate::trajectory::Trajectory;
 
 impl ParsecData {
-    const METALLICITY: &'static str = "Z0.01";
-    const FILENAME: &'static str = "Z0.01.rmp";
-
     pub(crate) fn new(metallicity: Metallicity) -> Result<ParsecData, ParsecAccessError> {
         let project_dirs = get_project_dirs()?;
         let data_dir = project_dirs.data_dir();
-        let file_path = data_dir.join(Self::FILENAME);
+        let file_path = data_dir.join(metallicity.to_string() + ".rmp");
 
         if file_path.exists() {
             println!("Reading PARSEC data from {}", file_path.display());
@@ -35,8 +33,8 @@ impl ParsecData {
                 ))
             }
         } else {
-            Self::ensure_data_files()?;
-            let folder_path = data_dir.join(PathBuf::from(Self::METALLICITY));
+            Self::ensure_data_files(&metallicity)?;
+            let folder_path = data_dir.join(PathBuf::from(metallicity.to_string()));
             let filepaths = fs::read_dir(folder_path).map_err(ParsecAccessError::Io)?;
             let mut parsec_data = ParsecData {
                 metallicity,
@@ -64,7 +62,7 @@ impl ParsecData {
         }
     }
 
-    fn download() -> Result<(), ParsecAccessError> {
+    fn download(metallicity: &Metallicity) -> Result<(), ParsecAccessError> {
         let project_dirs = get_project_dirs()?;
         let data_dir = project_dirs.data_dir();
         let data_dir = data_dir
@@ -74,9 +72,7 @@ impl ParsecData {
                 "Could not convert data dir to string",
             )))?;
         println!("Downloading PARSEC data to {}", data_dir);
-        let target = "https://people.sissa.it/~sbressan/CAF09_V1.2S_M36_LT/no_phase/".to_string()
-            + Self::METALLICITY
-            + ".tar.gz";
+        let target = PARSEC_URL.to_string() + metallicity.to_archive_name();
         let mut response = reqwest::blocking::get(target).map_err(ParsecAccessError::Connection)?;
         let gz_decoder = GzDecoder::new(&mut response);
         let mut archive = Archive::new(gz_decoder);
@@ -84,12 +80,13 @@ impl ParsecData {
         Ok(())
     }
 
-    fn ensure_data_files() -> Result<(), ParsecAccessError> {
+    fn ensure_data_files(metallicity: &Metallicity) -> Result<(), ParsecAccessError> {
         let project_dirs = get_project_dirs()?;
         let data_dir = project_dirs.data_dir();
-        let path = data_dir.join(PathBuf::from(Self::METALLICITY));
+        let dirname = metallicity.to_string();
+        let path = data_dir.join(PathBuf::from(dirname));
         if !path.exists() {
-            Self::download()?;
+            Self::download(metallicity)?;
         }
         Ok(())
     }
