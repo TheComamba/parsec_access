@@ -17,21 +17,19 @@ use crate::trajectory::Trajectory;
 
 impl ParsecData {
     pub(crate) fn new(metallicity: Metallicity) -> Result<ParsecData, ParsecAccessError> {
-        let project_dirs = get_project_dirs()?;
-        let data_dir = project_dirs.data_dir();
+        let data_dir = get_data_dir()?;
         let file_path = data_dir.join(metallicity.to_string() + ".rmp");
 
         if file_path.exists() {
             read_existing_parsec_file(file_path)
         } else {
-            create_parsec_data_file(metallicity, data_dir, file_path)
+            create_parsec_data_file(metallicity, &data_dir, file_path)
         }
     }
 }
 
 fn download(metallicity: &Metallicity) -> Result<(), ParsecAccessError> {
-    let project_dirs = get_project_dirs()?;
-    let data_dir = project_dirs.data_dir();
+    let data_dir = get_data_dir()?;
     let data_dir = data_dir
         .to_str()
         .ok_or(ParsecAccessError::Io(std::io::Error::new(
@@ -65,8 +63,7 @@ fn read_trajectory_file(file_path: PathBuf) -> Result<Trajectory, ParsecAccessEr
 }
 
 fn ensure_data_files(metallicity: &Metallicity) -> Result<(), ParsecAccessError> {
-    let project_dirs = get_project_dirs()?;
-    let data_dir = project_dirs.data_dir();
+    let data_dir = get_data_dir()?;
     let dirname = metallicity.to_archive_name().replace(".tar.gz", "");
     let path = data_dir.join(PathBuf::from(dirname));
     if !path.exists() {
@@ -76,8 +73,7 @@ fn ensure_data_files(metallicity: &Metallicity) -> Result<(), ParsecAccessError>
 }
 
 fn delete_data_files(metallicity: &Metallicity) -> Result<(), ParsecAccessError> {
-    let project_dirs = get_project_dirs()?;
-    let data_dir = project_dirs.data_dir();
+    let data_dir = get_data_dir()?;
     let dirname = metallicity.to_archive_name().replace(".tar.gz", "");
     let path = data_dir.join(PathBuf::from(dirname));
     if path.exists() {
@@ -86,7 +82,11 @@ fn delete_data_files(metallicity: &Metallicity) -> Result<(), ParsecAccessError>
     Ok(())
 }
 
-fn create_parsec_data_file(metallicity: Metallicity, data_dir: &std::path::Path, file_path: PathBuf) -> Result<ParsecData, ParsecAccessError> {
+fn create_parsec_data_file(
+    metallicity: Metallicity,
+    data_dir: &PathBuf,
+    file_path: PathBuf,
+) -> Result<ParsecData, ParsecAccessError> {
     ensure_data_files(&metallicity)?;
     let data_dir_name = metallicity.to_archive_name().replace(".tar.gz", "");
     let folder_path = data_dir.join(PathBuf::from(data_dir_name));
@@ -102,8 +102,7 @@ fn create_parsec_data_file(metallicity: Metallicity, data_dir: &std::path::Path,
     }
     println!("Writing PARSEC data to {}", file_path.display());
     let file = File::create(&file_path).map_err(ParsecAccessError::Io)?;
-    let buffer =
-        rmp_serde::to_vec(&parsec_data).map_err(ParsecAccessError::RmpSerialization)?;
+    let buffer = rmp_serde::to_vec(&parsec_data).map_err(ParsecAccessError::RmpSerialization)?;
     let mut writer = BufWriter::new(file);
     writer.write_all(&buffer).map_err(ParsecAccessError::Io)?;
     delete_data_files(&metallicity)?;
@@ -135,9 +134,12 @@ fn is_header(line: &String) -> bool {
         .any(|c| c.is_alphabetic() && c != 'E' && c != 'e')
 }
 
-fn get_project_dirs() -> Result<ProjectDirs, ParsecAccessError> {
+fn get_data_dir() -> Result<PathBuf, ParsecAccessError> {
     // TODO: Include version in project dirs
-    ProjectDirs::from("", "the_comamba", "parsec_access").ok_or(ParsecAccessError::Io(
-        std::io::Error::new(std::io::ErrorKind::Other, "Could not get project dirs"),
-    ))
+    let error = ParsecAccessError::Io(std::io::Error::new(
+        std::io::ErrorKind::Other,
+        "Could not get project dirs",
+    ));
+    let project_dirs = ProjectDirs::from("", "the_comamba", "parsec_access").ok_or(error)?;
+    Ok(project_dirs.data_dir().into())
 }
