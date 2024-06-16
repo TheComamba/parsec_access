@@ -114,6 +114,7 @@ impl ParsecData {
 }
 
 fn get_project_dirs() -> Result<ProjectDirs, ParsecAccessError> {
+    // TODO: Include version in project dirs
     ProjectDirs::from("", "the_comamba", "parsec_access").ok_or(ParsecAccessError::Io(
         std::io::Error::new(std::io::ErrorKind::Other, "Could not get project dirs"),
     ))

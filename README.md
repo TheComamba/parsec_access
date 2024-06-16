@@ -13,6 +13,8 @@ parsec_access = "0.1.0"
 
 TODO: Usage example.
 
+TODO: Github workflows, including tests, check for updates, and check for todos.
+
 ## License
 
 This software is distributed under the [MIT](https://choosealicense.com/licenses/mit/) license. In a nutshell this means that all code is made public, and you are free to use it without any charge.
