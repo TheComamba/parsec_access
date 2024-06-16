@@ -12,7 +12,7 @@ use crate::access::masses::{get_filenames, get_masses};
 use crate::access::metallicity::Metallicity;
 use crate::access::PARSEC_URL;
 use crate::error::ParsecAccessError;
-use crate::line::ParsecLine;
+use crate::line::ParsedParsecLine;
 use crate::trajectory::Trajectory;
 
 impl ParsecData {
@@ -117,7 +117,7 @@ impl ParsecData {
         let reader = BufReader::new(file);
         let mut lines = vec![];
         for line in reader.lines() {
-            ParsecLine::read(line, &mut lines)?;
+            lines.push(ParsedParsecLine::read(line)?);
         }
         let trajectory = Trajectory::new(lines);
         parsec_data.data[mass_index] = trajectory;

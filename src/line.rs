@@ -20,17 +20,14 @@ pub(crate) struct ParsedParsecLine {
     pub(super) radius_in_solar_radii: f64,
 }
 
-impl ParsecLine {
+impl ParsedParsecLine {
     const MASS_INDEX: usize = 1;
     const AGE_INDEX: usize = 2;
     const LOG_L_INDEX: usize = 3;
     const LOG_TE_INDEX: usize = 4;
     const LOG_R_INDEX: usize = 5;
 
-    pub(super) fn read(
-        line: Result<String, std::io::Error>,
-        lines: &mut Vec<ParsedParsecLine>,
-    ) -> Result<(), ParsecAccessError> {
+    pub(super) fn read(line: Result<String, std::io::Error>) -> Result<Self, ParsecAccessError> {
         let line = line.map_err(ParsecAccessError::Io)?;
         let entries: Vec<&str> = line.split_whitespace().collect();
         let mass_entry = entries
@@ -65,16 +62,16 @@ impl ParsecLine {
             }
             .parse();
 
-            lines.push(parsec_line);
+            Ok(parsec_line)
         } else {
-            return Err(ParsecAccessError::DataNotAvailable(
+            Err(ParsecAccessError::DataNotAvailable(
                 "[Parsing failed]".to_string(),
-            ));
+            ))
         }
-
-        Ok(())
     }
+}
 
+impl ParsecLine {
     fn parse(self) -> ParsedParsecLine {
         let radius = Distance::from_cm(10f64.powf(self.log_r));
         const SOLAR_RADIUS: Distance<f64> = Distance { m: 6.957e8 };
