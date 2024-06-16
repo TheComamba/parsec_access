@@ -7,8 +7,8 @@ use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::path::PathBuf;
 use tar::Archive;
 
+use crate::access::data::ParsecData;
 use crate::access::metallicity::Metallicity;
-use crate::data::ParsecData;
 use crate::error::ParsecAccessError;
 use crate::line::ParsecLine;
 use crate::trajectory::Trajectory;

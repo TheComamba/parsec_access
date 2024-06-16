@@ -65,7 +65,7 @@ static DATA: [&Mutex<Result<ParsecData, ParsecAccessError>>; 15] = [
 #[derive(Deserialize, Serialize)]
 pub(crate) struct ParsecData {
     pub metallicity: Metallicity,
-    pub(super) data: Vec<Trajectory>,
+    pub(crate) data: Vec<Trajectory>,
 }
 
 impl Index<usize> for ParsecData {

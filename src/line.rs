@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use simple_si_units::base::Distance;
 
-use crate::{data::ParsecData, error::ParsecAccessError};
+use crate::{access::data::ParsecData, error::ParsecAccessError};
 
 pub(super) struct ParsecLine {
     mass: f64,
