@@ -76,7 +76,7 @@ mod tests {{
 
         // Ensure that the data is loaded into memory.
         for i in 0..N {{
-            let _ = DATA[i][1][1];
+            let _ = DATA[i].lock().unwrap().as_ref().unwrap()[1][1];
         }}
 
         // Create pseudo-random indices.
@@ -91,7 +91,7 @@ mod tests {{
         // Access the data in a pseudo-random order.
         let now = std::time::Instant::now();
         for (metallicity_index, mass_index, trajectory_index) in indices {{
-            let _ = DATA[metallicity_index][mass_index][trajectory_index];
+            let _ = DATA[metallicity_index].lock().unwrap().as_ref().unwrap()[mass_index][trajectory_index];
         }}
         let elapsed = now.elapsed();
 
