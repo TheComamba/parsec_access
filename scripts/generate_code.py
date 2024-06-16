@@ -360,3 +360,5 @@ def main():
     generate_masses_file(metallicities, metallicity_to_masses, metallicity_and_mass_to_filename)
 
 main()
+
+# TODO: Create a check for updates workflow
