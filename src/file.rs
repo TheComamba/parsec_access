@@ -14,6 +14,7 @@ use crate::access::PARSEC_URL;
 use crate::error::ParsecAccessError;
 use crate::line::ParsedParsecLine;
 use crate::trajectory::Trajectory;
+use crate::{PACKAGE_NAME, PACKAGE_VERSION};
 
 impl ParsecData {
     pub(crate) fn new(metallicity: Metallicity) -> Result<ParsecData, ParsecAccessError> {
@@ -156,6 +157,7 @@ fn get_data_dir() -> Result<PathBuf, ParsecAccessError> {
         std::io::ErrorKind::Other,
         "Could not get project dirs",
     ));
-    let project_dirs = ProjectDirs::from("", "the_comamba", "parsec_access").ok_or(error)?;
+    let app = PACKAGE_NAME.to_string() + PACKAGE_VERSION;
+    let project_dirs = ProjectDirs::from("", "the_comamba", &app).ok_or(error)?;
     Ok(project_dirs.data_dir().into())
 }

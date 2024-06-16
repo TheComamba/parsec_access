@@ -5,8 +5,8 @@
 
 cd $(git rev-parse --show-toplevel)
 
-# Remove the old data
-rm -rf ~/.local/share/parsec_access
-mkdir -p ~/.local/share/parsec_access
-find dev_data -type d -name "Z*" -exec cp -r {} ~/.local/share/parsec_access \;
-ls -l ~/.local/share/parsec_access
+dir="/home/simon/.local/share/parsec_access_0.1.0"
+rm -rf $dir
+mkdir -p $dir
+find dev_data -type d -name "Z*" -exec cp -r {} $dir \;
+ls -l $dir
