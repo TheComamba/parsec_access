@@ -88,6 +88,12 @@ fn get_masses(metallicity: &Metallicity) -> &[f64] {{
         {metallicity_to_masses}
     }}
 }}
+
+fn get_filenames(metallicity: &Metallicity) -> &[&str] {{
+    match metallicity {{
+        {metallicity_to_filenames}
+    }}
+}}
 """
 
 def assure_dev_data_folder():
@@ -202,7 +208,7 @@ def generate_find_closest_function(input_variable_name, variant_and_value_pairs)
     return function_str
 
 def metallicity_variant_name(metallicity):
-    return "Z" + metallicity.replace(".", "p")
+    return "Z" + metallicity.replace(".", "_")
 
 def generate_metallicity_file(metallicities, metallicity_to_archive_name):
     enum_str = ""
@@ -254,17 +260,20 @@ def generate_masses_file(metallicities, metallicity_to_masses, metallicity_and_m
     sorted_masses = ""
     filenames = ""
     metallicity_to_masses_str = ""
+    metallicity_to_filenames_str = ""
     for metallicity in metallicities:
         masses = metallicity_to_masses[metallicity]
         sorted_masses += generate_masses_constant(metallicity, masses) + "\n"
         filenames += generate_filename_constant(metallicity, masses, metallicity_and_mass_to_filename[metallicity]) + "\n"
         metallicity_name = metallicity_variant_name(metallicity)
         metallicity_to_masses_str += f"Metallicity::{metallicity_name} => &{metallicity_name}_SORTED_MASSES,\n"
+        metallicity_to_filenames_str += f"Metallicity::{metallicity_name} => &{metallicity_name}_FILENAMES,\n"
 
     with open(TARGET_DIR + "masses.rs", 'w') as f:
         f.write(MASSES_TEMPLATE.format(sorted_masses=sorted_masses,
                                        filenames=filenames,
-                                       metallicity_to_masses=metallicity_to_masses_str))
+                                       metallicity_to_masses=metallicity_to_masses_str,
+                                       metallicity_to_filenames=metallicity_to_filenames_str))
 
 def main():
     assure_dev_data_folder()
