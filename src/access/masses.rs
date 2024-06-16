@@ -1737,7 +1737,8 @@ const Z0_0600_FILENAMES: [&str; 99] = [
     "Z0.06Y0.356OUTA1.74_F7_M350.000.DAT",
 ];
 
-fn get_masses(metallicity: &Metallicity) -> &[f64] {
+/// Returns a reference to the sorted array of masses available for the given metallicity.
+pub fn get_masses(metallicity: &Metallicity) -> &[f64] {
     match metallicity {
         Metallicity::Z0_0001 => &Z0_0001_SORTED_MASSES,
         Metallicity::Z0_0002 => &Z0_0002_SORTED_MASSES,
@@ -1757,6 +1758,8 @@ fn get_masses(metallicity: &Metallicity) -> &[f64] {
     }
 }
 
+/// Returns a reference to the sorted array of filenames available for the given metallicity.
+/// The files have the same order as the masses, and can thus be accessed via index.
 fn get_filenames(metallicity: &Metallicity) -> &[&str] {
     match metallicity {
         Metallicity::Z0_0001 => &Z0_0001_FILENAMES,
