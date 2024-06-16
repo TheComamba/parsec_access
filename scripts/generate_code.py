@@ -1,7 +1,8 @@
 
-from bs4 import BeautifulSoup
-import glob
+from bs4 import BeautifulSoup # Pulling data out of HTML and XML files
+import glob # Unix style pathname pattern expansion
 import os
+import re # Regular Expressions
 import requests
 import tarfile
 
@@ -20,6 +21,24 @@ def collect_archive_names():
         if href and href.endswith('.tar.gz'):
             archive_names.append(href)
     return archive_names
+
+def normalised_metallicity_string(metallicity):
+    if not metallicity.startswith("0."):
+        metallicity = "0." + metallicity
+    metallicity_float = float(metallicity)
+    return "{:.4f}".format(metallicity_float)
+
+def create_map_from_metallicity_to_archive_name(archive_names):
+    map = {}
+    metallicities = []
+    for archive_name in archive_names:
+        if archive_name.endswith('.tar.gz'):
+            match = re.search('Z(.*?)Y', archive_name)
+            metallicity = normalised_metallicity_string(match.group(1))
+            map[metallicity] = archive_name
+            metallicities.append(metallicity)
+    metallicities.sort()
+    return map, metallicities
 
 def assure_archive_downloaded(archive_name):
     archive_path = f'dev_data/{archive_name}'
@@ -53,10 +72,11 @@ def delete_obsolete_files(archive_name):
 def main():
     assure_dev_data_folder()
     archive_names = collect_archive_names()
-    archive_names.sort()
     for archive_name in archive_names:
         assure_archive_downloaded(archive_name)
         assure_extracted(archive_name)
         delete_obsolete_files(archive_name)
+    metallicity_to_archive_name, metallicities = create_map_from_metallicity_to_archive_name(archive_names)
+    
 
 main()
