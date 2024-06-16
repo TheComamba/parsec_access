@@ -39,9 +39,11 @@ lazy_static! {{
     {static_data}
 }}
 
-static DATA: [&Mutex<Result<ParsecData, ParsecAccessError>>; {array_size}] = [
-    {access_array}
-];
+lazy_static! {{
+    static ref DATA: [&'static Mutex<Result<ParsecData, ParsecAccessError>>; {array_size}] = [
+        {access_array}
+    ];
+}}
 
 #[derive(Deserialize, Serialize)]
 pub(crate) struct ParsecData {{

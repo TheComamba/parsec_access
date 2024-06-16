@@ -44,23 +44,25 @@ lazy_static! {
         Mutex::new(ParsecData::new());
 }
 
-static DATA: [&Mutex<Result<ParsecData, ParsecAccessError>>; 15] = [
-    &Z0_0001_DATA,
-    &Z0_0002_DATA,
-    &Z0_0005_DATA,
-    &Z0_0010_DATA,
-    &Z0_0020_DATA,
-    &Z0_0040_DATA,
-    &Z0_0060_DATA,
-    &Z0_0080_DATA,
-    &Z0_0100_DATA,
-    &Z0_0140_DATA,
-    &Z0_0170_DATA,
-    &Z0_0200_DATA,
-    &Z0_0300_DATA,
-    &Z0_0400_DATA,
-    &Z0_0600_DATA,
-];
+lazy_static! {
+    static ref DATA: [&'static Mutex<Result<ParsecData, ParsecAccessError>>; 15] = [
+        &Z0_0001_DATA,
+        &Z0_0002_DATA,
+        &Z0_0005_DATA,
+        &Z0_0010_DATA,
+        &Z0_0020_DATA,
+        &Z0_0040_DATA,
+        &Z0_0060_DATA,
+        &Z0_0080_DATA,
+        &Z0_0100_DATA,
+        &Z0_0140_DATA,
+        &Z0_0170_DATA,
+        &Z0_0200_DATA,
+        &Z0_0300_DATA,
+        &Z0_0400_DATA,
+        &Z0_0600_DATA,
+    ];
+}
 
 #[derive(Deserialize, Serialize)]
 pub(crate) struct ParsecData {
