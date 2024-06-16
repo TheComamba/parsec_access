@@ -66,18 +66,16 @@ mod tests {{
     #[test]
     #[ignore]
     fn data_access_is_fast() {{
-        const N: usize = 1000;
+        const N: usize = 1e6 as usize;
         const PRIME1: usize = 1009;
         const PRIME2: usize = 1013;
         const PRIME3: usize = 10007;
         const MAX_METALLICITY_INDEX: usize = 10;
         const MAX_MASS_INDEX: usize = 50;
-        const MAX_TRAJECTORY_INDEX: usize = 1000;
+        const MAX_TRAJECTORY_INDEX: usize = 100;
 
         // Ensure that the data is loaded into memory.
-        for i in 0..N {{
-            let _ = DATA[i].lock().unwrap().as_ref().unwrap()[1][1];
-        }}
+        let _ = DATA[1].lock().unwrap().as_ref().unwrap()[1][1];
 
         // Create pseudo-random indices.
         let mut indices = Vec::new();
@@ -90,10 +88,13 @@ mod tests {{
 
         // Access the data in a pseudo-random order.
         let now = std::time::Instant::now();
+        let mut total_mass = 0.;
         for (metallicity_index, mass_index, trajectory_index) in indices {{
-            let _ = DATA[metallicity_index].lock().unwrap().as_ref().unwrap()[mass_index][trajectory_index];
+            let m = DATA[metallicity_index].lock().unwrap().as_ref().unwrap()[mass_index][trajectory_index].mass_in_solar_masses;
+            total_mass += m;
         }}
         let elapsed = now.elapsed();
+        println!("Collected a total mass of {{}} solar masses.", total_mass);
 
         println!("Accessing {{}} data points took {{:?}}", N, elapsed);
     }}
