@@ -152,12 +152,11 @@ fn is_header(line: &String) -> bool {
 }
 
 fn get_data_dir() -> Result<PathBuf, ParsecAccessError> {
-    // TODO: Include version in project dirs
     let error = ParsecAccessError::Io(std::io::Error::new(
         std::io::ErrorKind::Other,
         "Could not get project dirs",
     ));
-    let app = PACKAGE_NAME.to_string() + PACKAGE_VERSION;
+    let app = format!("{}_{}", PACKAGE_NAME, PACKAGE_VERSION);
     let project_dirs = ProjectDirs::from("", "the_comamba", &app).ok_or(error)?;
     Ok(project_dirs.data_dir().into())
 }
