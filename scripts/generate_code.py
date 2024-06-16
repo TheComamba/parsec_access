@@ -29,7 +29,6 @@ DATA_TEMPLATE = """
 use lazy_static::lazy_static;
 use serde::{{Deserialize, Serialize}};
 use std::ops::Index;
-use std::sync::Mutex;
 
 use crate::{{error::ParsecAccessError, trajectory::Trajectory}};
 
@@ -40,7 +39,7 @@ lazy_static! {{
 }}
 
 lazy_static! {{
-    static ref DATA: [&'static Mutex<Result<ParsecData, ParsecAccessError>>; {array_size}] = [
+    static ref DATA: [&'static Result<ParsecData, ParsecAccessError>; {array_size}] = [
         {access_array}
     ];
 }}
@@ -75,7 +74,7 @@ mod tests {{
         const MAX_TRAJECTORY_INDEX: usize = 100;
 
         // Ensure that the data is loaded into memory.
-        let _ = DATA[1].lock().unwrap().as_ref().unwrap()[1][1];
+        let _ = DATA[1].as_ref().unwrap()[1][1];
 
         // Create pseudo-random indices.
         let mut indices = Vec::new();
@@ -90,7 +89,7 @@ mod tests {{
         let now = std::time::Instant::now();
         let mut total_mass = 0.;
         for (metallicity_index, mass_index, trajectory_index) in indices {{
-            let m = DATA[metallicity_index].lock().unwrap().as_ref().unwrap()[mass_index][trajectory_index].mass_in_solar_masses;
+            let m = DATA[metallicity_index].as_ref().unwrap()[mass_index][trajectory_index].mass_in_solar_masses;
             total_mass += m;
         }}
         let elapsed = now.elapsed();
@@ -339,8 +338,8 @@ def generate_data_file(metallicities):
     for metallicity in metallicities:
         variant_name = metallicity_variant_name(metallicity)
         static_data += f"static {variant_name}_DATA:"
-        static_data += "Mutex<Result<ParsecData, ParsecAccessError>> = "
-        static_data += "Mutex::new(ParsecData::new());\n"
+        static_data += "Result<ParsecData, ParsecAccessError> = "
+        static_data += "ParsecData::new();\n"
         access_array += f"&{variant_name}_DATA,\n"
 
     with open(TARGET_DIR + "data.rs", 'w') as f:

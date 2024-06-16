@@ -5,47 +5,31 @@
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::ops::Index;
-use std::sync::Mutex;
 
 use crate::{error::ParsecAccessError, trajectory::Trajectory};
 
 use super::metallicity::Metallicity;
 
 lazy_static! {
-    static ref Z0_0001_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0002_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0005_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0010_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0020_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0040_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0060_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0080_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0100_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0140_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0170_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0200_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0300_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0400_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
-    static ref Z0_0600_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
-        Mutex::new(ParsecData::new());
+    static ref Z0_0001_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0002_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0005_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0010_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0020_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0040_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0060_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0080_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0100_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0140_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0170_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0200_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0300_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0400_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0600_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
 }
 
 lazy_static! {
-    static ref DATA: [&'static Mutex<Result<ParsecData, ParsecAccessError>>; 15] = [
+    static ref DATA: [&'static Result<ParsecData, ParsecAccessError>; 15] = [
         &Z0_0001_DATA,
         &Z0_0002_DATA,
         &Z0_0005_DATA,
@@ -94,7 +78,7 @@ mod tests {
         const MAX_TRAJECTORY_INDEX: usize = 100;
 
         // Ensure that the data is loaded into memory.
-        let _ = DATA[1].lock().unwrap().as_ref().unwrap()[1][1];
+        let _ = DATA[1].as_ref().unwrap()[1][1];
 
         // Create pseudo-random indices.
         let mut indices = Vec::new();
@@ -109,8 +93,7 @@ mod tests {
         let now = std::time::Instant::now();
         let mut total_mass = 0.;
         for (metallicity_index, mass_index, trajectory_index) in indices {
-            let m = DATA[metallicity_index].lock().unwrap().as_ref().unwrap()[mass_index]
-                [trajectory_index]
+            let m = DATA[metallicity_index].as_ref().unwrap()[mass_index][trajectory_index]
                 .mass_in_solar_masses;
             total_mass += m;
         }
