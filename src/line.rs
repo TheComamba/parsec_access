@@ -27,8 +27,7 @@ impl ParsedParsecLine {
     const LOG_TE_INDEX: usize = 4;
     const LOG_R_INDEX: usize = 5;
 
-    pub(super) fn read(line: Result<String, std::io::Error>) -> Result<Self, ParsecAccessError> {
-        let line = line.map_err(ParsecAccessError::Io)?;
+    pub(super) fn read(line: String) -> Result<Self, ParsecAccessError> {
         let entries: Vec<&str> = line.split_whitespace().collect();
         let mass_entry = entries
             .get(Self::MASS_INDEX)

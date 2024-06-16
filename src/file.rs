@@ -112,10 +112,19 @@ impl ParsecData {
         let reader = BufReader::new(file);
         let mut lines = vec![];
         for line in reader.lines() {
-            lines.push(ParsedParsecLine::read(line)?);
+            let line = line.map_err(ParsecAccessError::Io)?;
+            if !is_header(&line) {
+                let line = ParsedParsecLine::read(line)?;
+                lines.push(line);
+            }
         }
         Ok(Trajectory::new(lines))
     }
+}
+
+fn is_header(line: &String) -> bool {
+    line.chars()
+        .any(|c| c.is_alphabetic() && c != 'E' && c != 'e')
 }
 
 fn get_project_dirs() -> Result<ProjectDirs, ParsecAccessError> {
