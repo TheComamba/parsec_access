@@ -2,6 +2,6 @@
 
 //! Provides access to an enum for the available metallicities, arrays of masses for each metallicity, and several helper functions.
 
-pub mod data;
+pub(crate) mod data;
 pub mod masses;
 pub mod metallicity;

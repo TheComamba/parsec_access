@@ -34,7 +34,13 @@ use crate::{{error::ParsecAccessError, trajectory::Trajectory}};
 
 use super::metallicity::Metallicity;
 
-{static_data}
+lazy_static! {{
+    {static_data}
+}}
+
+static DATA: [&Mutex<Result<ParsecData, ParsecAccessError>>; {array_size}] = [
+    {access_array}
+];
 
 #[derive(Deserialize, Serialize)]
 pub(crate) struct ParsecData {{
@@ -275,10 +281,20 @@ def generate_mod_file():
     with open(TARGET_DIR + "mod.rs", 'w') as f:
         f.write(MOD_TEMPLATE)
 
-def generate_data_file():
+def generate_data_file(metallicities):
     static_data = ""
+    access_array = ""
+    for metallicity in metallicities:
+        variant_name = metallicity_variant_name(metallicity)
+        static_data += f"static {variant_name}_DATA:"
+        static_data += "Mutex<Result<ParsecData, ParsecAccessError>> = "
+        static_data += "Mutex::new(ParsecData::new());\n"
+        access_array += f"&{variant_name}_DATA,\n"
+
     with open(TARGET_DIR + "data.rs", 'w') as f:
-        f.write(DATA_TEMPLATE.format(static_data=static_data))
+        f.write(DATA_TEMPLATE.format(static_data=static_data, 
+                                     array_size=len(metallicities),
+                                     access_array=access_array))
 
 def mass_fraction_to_dex(mass_fraction):
     Z_sun = 0.0122
@@ -386,7 +402,7 @@ def main():
 
     clean_target_dir()
     generate_mod_file()
-    generate_data_file()
+    generate_data_file(metallicities)
     generate_metallicity_file(metallicities, metallicity_to_archive_name)
     generate_masses_file(metallicities, metallicity_to_masses, metallicity_and_mass_to_filename)
 
