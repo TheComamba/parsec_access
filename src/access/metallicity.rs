@@ -2,9 +2,11 @@
 
 //! Provides an enum for the available metallicities and several helper functions.
 
+use serde::{Deserialize, Serialize};
+
 /// Enum for the available metallicities.
 /// The naming convention is Z followed by the metallicity in mass fraction, with the decimal point replaced by an underscore.
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub enum Metallicity {
     /// Metallic mass fraction Z = 0.0001
     Z0_0001,

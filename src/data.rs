@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 
-use crate::{error::ParsecAccessError, trajectory::Trajectory};
+use crate::{access::metallicity::Metallicity, error::ParsecAccessError, trajectory::Trajectory};
 
 lazy_static! {
     pub(crate) static ref PARSEC_DATA: Mutex<Result<ParsecData, ParsecAccessError>> =
@@ -10,7 +10,8 @@ lazy_static! {
 }
 
 #[derive(Deserialize, Serialize)]
-pub(crate) struct ParsecData {
+pub struct ParsecData {
+    pub metallicity: Metallicity,
     pub(super) data: Vec<Trajectory>,
 }
 
