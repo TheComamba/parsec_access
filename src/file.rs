@@ -17,7 +17,7 @@ impl ParsecData {
     const METALLICITY: &'static str = "Z0.01";
     const FILENAME: &'static str = "Z0.01.rmp";
 
-    pub(crate) fn new() -> Result<ParsecData, ParsecAccessError> {
+    pub(crate) fn new(metallicity: Metallicity) -> Result<ParsecData, ParsecAccessError> {
         let project_dirs = get_project_dirs()?;
         let data_dir = project_dirs.data_dir();
         let file_path = data_dir.join(Self::FILENAME);
@@ -39,7 +39,7 @@ impl ParsecData {
             let folder_path = data_dir.join(PathBuf::from(Self::METALLICITY));
             let filepaths = fs::read_dir(folder_path).map_err(ParsecAccessError::Io)?;
             let mut parsec_data = ParsecData {
-                metallicity: Metallicity::Z0_0100,
+                metallicity,
                 data: Vec::with_capacity(Self::SORTED_MASSES.len()),
             };
             for _ in Self::SORTED_MASSES.iter() {

@@ -11,21 +11,36 @@ use crate::{error::ParsecAccessError, trajectory::Trajectory};
 use super::metallicity::Metallicity;
 
 lazy_static! {
-    static ref Z0_0001_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0002_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0005_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0010_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0020_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0040_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0060_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0080_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0100_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0140_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0170_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0200_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0300_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0400_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
-    static ref Z0_0600_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new();
+    static ref Z0_0001_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0001);
+    static ref Z0_0002_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0002);
+    static ref Z0_0005_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0005);
+    static ref Z0_0010_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0010);
+    static ref Z0_0020_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0020);
+    static ref Z0_0040_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0040);
+    static ref Z0_0060_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0060);
+    static ref Z0_0080_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0080);
+    static ref Z0_0100_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0100);
+    static ref Z0_0140_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0140);
+    static ref Z0_0170_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0170);
+    static ref Z0_0200_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0200);
+    static ref Z0_0300_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0300);
+    static ref Z0_0400_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0400);
+    static ref Z0_0600_DATA: Result<ParsecData, ParsecAccessError> =
+        ParsecData::new(Metallicity::Z0_0600);
 }
 
 lazy_static! {

@@ -339,7 +339,7 @@ def generate_data_file(metallicities):
         variant_name = metallicity_variant_name(metallicity)
         static_data += f"static {variant_name}_DATA:"
         static_data += "Result<ParsecData, ParsecAccessError> = "
-        static_data += "ParsecData::new();\n"
+        static_data += f"ParsecData::new(Metallicity::{variant_name});\n"
         access_array += f"&{variant_name}_DATA,\n"
 
     with open(TARGET_DIR + "data.rs", 'w') as f:
