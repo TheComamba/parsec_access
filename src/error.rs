@@ -1,11 +1,19 @@
+//! Error handling for the Parsec access library.
+
 use std::fmt;
 
+/// Represents an error that can occur when accessing the Parsec data.
 #[derive(Debug)]
 pub enum ParsecAccessError {
+    /// An error occurred while trying to establish a connection to the Parsec server.
     Connection(reqwest::Error),
+    /// The requested data is not available.
     DataNotAvailable(String),
+    /// An I/O error occurred.
     Io(std::io::Error),
+    /// An error occurred during MessagePack serialization.
     RmpSerialization(rmp_serde::encode::Error),
+    /// An error occurred during MessagePack deserialization.
     RmpDeserialization(rmp_serde::decode::Error),
 }
 

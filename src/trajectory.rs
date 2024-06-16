@@ -20,12 +20,6 @@ impl Index<usize> for Trajectory {
 }
 
 impl Trajectory {
-    pub(super) const EMPTY: Trajectory = Trajectory {
-        params: Vec::new(),
-        initial_mass: Mass { kg: 0. },
-        lifetime: Time { s: 0. },
-    };
-
     pub(super) fn new(params: Vec<ParsedParsecLine>) -> Self {
         let initial_mass = Mass::from_solar_mass(params[0].mass_in_solar_masses);
         let lifetime = match params.last() {
