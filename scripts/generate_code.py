@@ -81,6 +81,8 @@ use super::metallicity::Metallicity;
 
 {sorted_masses}
 
+{filenames}
+
 fn get_masses(metallicity: &Metallicity) -> &[f64] {{
     match metallicity {{
         {metallicity_to_masses}
@@ -240,17 +242,28 @@ def generate_masses_constant(metallicity, masses):
     masses_str += "];"
     return masses_str
 
+def generate_filename_constant(metallicity, masses, mass_to_filename):
+    filenames_str = f"const {metallicity_variant_name(metallicity)}_FILENAMES: [&str; {len(masses)}] = ["
+    for mass in masses:
+        filename = os.path.basename(mass_to_filename[mass])
+        filenames_str += f"\"{filename}\", "
+    filenames_str += "];"
+    return filenames_str
+
 def generate_masses_file(metallicities, metallicity_to_masses, metallicity_and_mass_to_filename):
     sorted_masses = ""
+    filenames = ""
     metallicity_to_masses_str = ""
     for metallicity in metallicities:
         masses = metallicity_to_masses[metallicity]
         sorted_masses += generate_masses_constant(metallicity, masses) + "\n"
+        filenames += generate_filename_constant(metallicity, masses, metallicity_and_mass_to_filename[metallicity]) + "\n"
         metallicity_name = metallicity_variant_name(metallicity)
         metallicity_to_masses_str += f"Metallicity::{metallicity_name} => &{metallicity_name}_SORTED_MASSES,\n"
 
     with open(TARGET_DIR + "masses.rs", 'w') as f:
         f.write(MASSES_TEMPLATE.format(sorted_masses=sorted_masses,
+                                       filenames=filenames,
                                        metallicity_to_masses=metallicity_to_masses_str))
 
 def main():
