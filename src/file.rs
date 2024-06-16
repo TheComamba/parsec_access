@@ -44,9 +44,8 @@ impl ParsecData {
                 data: Vec::with_capacity(masses.len()),
             };
             for mass_index in 0..masses.len() {
-                parsec_data.data.push(Trajectory::EMPTY);
                 let filepath = folder_path.join(filepaths[mass_index]);
-                Self::read_file(mass_index, filepath, &mut parsec_data)?;
+                parsec_data.data.push(Self::read_file(filepath)?);
             }
             println!("Writing PARSEC data to {}", file_path.display());
             let file = File::create(&file_path).map_err(ParsecAccessError::Io)?;
@@ -108,20 +107,14 @@ impl ParsecData {
         Ok(())
     }
 
-    fn read_file(
-        mass_index: usize,
-        file_path: PathBuf,
-        parsec_data: &mut ParsecData,
-    ) -> Result<(), ParsecAccessError> {
+    fn read_file(file_path: PathBuf) -> Result<Trajectory, ParsecAccessError> {
         let file = File::open(file_path).map_err(ParsecAccessError::Io)?;
         let reader = BufReader::new(file);
         let mut lines = vec![];
         for line in reader.lines() {
             lines.push(ParsedParsecLine::read(line)?);
         }
-        let trajectory = Trajectory::new(lines);
-        parsec_data.data[mass_index] = trajectory;
-        Ok(())
+        Ok(Trajectory::new(lines))
     }
 }
 
