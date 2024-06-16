@@ -8,6 +8,7 @@ use std::path::PathBuf;
 use tar::Archive;
 
 use crate::access::data::ParsecData;
+use crate::access::masses::{get_filenames, get_masses};
 use crate::access::metallicity::Metallicity;
 use crate::access::PARSEC_URL;
 use crate::error::ParsecAccessError;
@@ -36,16 +37,16 @@ impl ParsecData {
             Self::ensure_data_files(&metallicity)?;
             let data_dir_name = metallicity.to_archive_name().replace(".tar.gz", "");
             let folder_path = data_dir.join(PathBuf::from(data_dir_name));
-            let filepaths = fs::read_dir(folder_path).map_err(ParsecAccessError::Io)?;
+            let masses = get_masses(&metallicity);
+            let filepaths = get_filenames(&metallicity);
             let mut parsec_data = ParsecData {
                 metallicity,
-                data: Vec::with_capacity(Self::SORTED_MASSES.len()),
+                data: Vec::with_capacity(masses.len()),
             };
-            for _ in Self::SORTED_MASSES.iter() {
+            for i in 0..masses.len() {
                 parsec_data.data.push(Trajectory::EMPTY);
-            }
-            for entry in filepaths {
-                Self::read_file(entry, &mut parsec_data)?;
+                let filepath = folder_path.join(filepaths[i]);
+                Self::read_file(filepath, &mut parsec_data)?;
             }
             println!("Writing PARSEC data to {}", file_path.display());
             let file = File::create(&file_path).map_err(ParsecAccessError::Io)?;
@@ -108,10 +109,9 @@ impl ParsecData {
     }
 
     fn read_file(
-        entry: Result<fs::DirEntry, std::io::Error>,
+        file_path: PathBuf,
         parsec_data: &mut ParsecData,
     ) -> Result<(), ParsecAccessError> {
-        let file_path = entry.map_err(ParsecAccessError::Io)?.path();
         let file = File::open(file_path).map_err(ParsecAccessError::Io)?;
         let reader = BufReader::new(file);
         let mut mass_position = None;
