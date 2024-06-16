@@ -34,7 +34,8 @@ impl ParsecData {
             }
         } else {
             Self::ensure_data_files(&metallicity)?;
-            let folder_path = data_dir.join(PathBuf::from(metallicity.to_string()));
+            let data_dir_name = metallicity.to_archive_name().replace(".tar.gz", "");
+            let folder_path = data_dir.join(PathBuf::from(data_dir_name));
             let filepaths = fs::read_dir(folder_path).map_err(ParsecAccessError::Io)?;
             let mut parsec_data = ParsecData {
                 metallicity,
@@ -52,6 +53,7 @@ impl ParsecData {
                 rmp_serde::to_vec(&parsec_data).map_err(ParsecAccessError::RmpSerialization)?;
             let mut writer = BufWriter::new(file);
             writer.write_all(&buffer).map_err(ParsecAccessError::Io)?;
+            Self::delete_data_files(&metallicity)?;
             if parsec_data.is_filled() {
                 Ok(parsec_data)
             } else {
@@ -71,7 +73,10 @@ impl ParsecData {
                 std::io::ErrorKind::Other,
                 "Could not convert data dir to string",
             )))?;
-        println!("Downloading PARSEC data to {}", data_dir);
+        println!(
+            "Downloading PARSEC data for {} to {}",
+            metallicity, data_dir
+        );
         let target = PARSEC_URL.to_string() + metallicity.to_archive_name();
         let mut response = reqwest::blocking::get(target).map_err(ParsecAccessError::Connection)?;
         let gz_decoder = GzDecoder::new(&mut response);
@@ -83,10 +88,21 @@ impl ParsecData {
     fn ensure_data_files(metallicity: &Metallicity) -> Result<(), ParsecAccessError> {
         let project_dirs = get_project_dirs()?;
         let data_dir = project_dirs.data_dir();
-        let dirname = metallicity.to_string();
+        let dirname = metallicity.to_archive_name().replace(".tar.gz", "");
         let path = data_dir.join(PathBuf::from(dirname));
         if !path.exists() {
             Self::download(metallicity)?;
+        }
+        Ok(())
+    }
+
+    fn delete_data_files(metallicity: &Metallicity) -> Result<(), ParsecAccessError> {
+        let project_dirs = get_project_dirs()?;
+        let data_dir = project_dirs.data_dir();
+        let dirname = metallicity.to_archive_name().replace(".tar.gz", "");
+        let path = data_dir.join(PathBuf::from(dirname));
+        if path.exists() {
+            fs::remove_dir_all(path).map_err(ParsecAccessError::Io)?;
         }
         Ok(())
     }
