@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use simple_si_units::base::{Mass, Time};
+use std::ops::Index;
 
 use super::line::ParsedParsecLine;
 
@@ -8,6 +9,14 @@ pub(super) struct Trajectory {
     params: Vec<ParsedParsecLine>,
     pub(super) initial_mass: Mass<f64>,
     pub(super) lifetime: Time<f64>,
+}
+
+impl Index<usize> for Trajectory {
+    type Output = ParsedParsecLine;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.params[index]
+    }
 }
 
 impl Trajectory {
