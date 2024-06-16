@@ -37,6 +37,10 @@ impl Metallicity {{
         }}
     }}
 
+    fn find_closest_from_mass_fraction(mass_fraction: f32) -> Metallicity {{
+        {find_closest_mass_fraction}
+    }}
+
     /// Converts the metallicity to units of dex for the element iron, using several assumptions.
     ///
     /// PARSEC lists metallicity as
@@ -60,6 +64,10 @@ impl Metallicity {{
         match self {{
             {metallicity_to_dex}
         }}
+    }}
+
+    fn find_closest_from_fe_dex(fe_dex: f32) -> Metallicity {{
+        {find_closest_dex}
     }}
 }}
 
@@ -160,25 +168,52 @@ def mass_fraction_to_dex(mass_fraction):
     Z_sun = 0.0122
     return math.log10(mass_fraction / Z_sun)
 
+def generate_find_closest_function(input_variable_name, variant_and_value_pairs):
+    intermediate_values = []
+    for i in range(len(variant_and_value_pairs) - 1):
+        _variant, value = variant_and_value_pairs[i]
+        _next_variant, next_value = variant_and_value_pairs[i + 1]
+        intermediate_values.append((value + next_value) / 2)
+    function_str = ""
+    for i in range(len(variant_and_value_pairs)):
+        variant, _value = variant_and_value_pairs[i]
+        if i < len(variant_and_value_pairs) - 1:
+            intermediate = intermediate_values[i]
+            function_str += f"if {input_variable_name} < {intermediate} {{ return {variant}; }}\n"
+        else:
+            function_str += f"return {variant};\n"
+    return function_str
+
 def generate_metallicity_file(metallicities, metallicity_to_archive_name):
     enum_str = ""
     to_archive_str = ""
     to_mass_fraction_str = ""
     to_dex_str = ""
+    metallicity_and_mass_fraction = []
+    metallicity_and_dex = []
     for metallicity in metallicities:
         enum_comment = "/// Metallic mass fraction Z = " + metallicity
         variant_name = "Z" + metallicity.replace(".", "p")
         archive_name = metallicity_to_archive_name[metallicity]
         mass_fraction = float(metallicity)
+        metallicity_and_mass_fraction.append((variant_name, mass_fraction))
         dex = mass_fraction_to_dex(mass_fraction)
+        metallicity_and_dex.append((variant_name, dex))
 
         enum_str += f"{enum_comment}\n{variant_name},\n"
         to_archive_str += f"Metallicity::{variant_name} => \"{archive_name}\",\n"
         to_mass_fraction_str += f"Metallicity::{variant_name} => {mass_fraction},\n"
         to_dex_str += f"Metallicity::{variant_name} => {dex},\n"
-    
+    find_closest_mass_fraction = generate_find_closest_function("mass_fraction", metallicity_and_mass_fraction)
+    find_closest_dex = generate_find_closest_function("fe_dex", metallicity_and_dex)
+
     with open(target_dir + "metallicity.rs", 'w') as f:
-        f.write(METALLICITY_TEMPLATE.format(metallicities=enum_str, metallicity_to_archive_name=to_archive_str, metallicity_to_mass_fraction=to_mass_fraction_str, metallicity_to_dex=to_dex_str))
+        f.write(METALLICITY_TEMPLATE.format(metallicities=enum_str,
+                                            metallicity_to_archive_name=to_archive_str,
+                                            metallicity_to_mass_fraction=to_mass_fraction_str,
+                                            find_closest_mass_fraction=find_closest_mass_fraction,
+                                            metallicity_to_dex=to_dex_str,
+                                            find_closest_dex=find_closest_dex))
 
 def main():
     assure_dev_data_folder()

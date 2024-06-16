@@ -74,6 +74,52 @@ impl Metallicity {
         }
     }
 
+    fn find_closest_from_mass_fraction(mass_fraction: f32) -> Metallicity {
+        if mass_fraction < 0.00015000000000000001 {
+            return Z0p0001;
+        }
+        if mass_fraction < 0.00035 {
+            return Z0p0002;
+        }
+        if mass_fraction < 0.00075 {
+            return Z0p0005;
+        }
+        if mass_fraction < 0.0015 {
+            return Z0p0010;
+        }
+        if mass_fraction < 0.003 {
+            return Z0p0020;
+        }
+        if mass_fraction < 0.005 {
+            return Z0p0040;
+        }
+        if mass_fraction < 0.007 {
+            return Z0p0060;
+        }
+        if mass_fraction < 0.009000000000000001 {
+            return Z0p0080;
+        }
+        if mass_fraction < 0.012 {
+            return Z0p0100;
+        }
+        if mass_fraction < 0.0155 {
+            return Z0p0140;
+        }
+        if mass_fraction < 0.018500000000000003 {
+            return Z0p0170;
+        }
+        if mass_fraction < 0.025 {
+            return Z0p0200;
+        }
+        if mass_fraction < 0.035 {
+            return Z0p0300;
+        }
+        if mass_fraction < 0.05 {
+            return Z0p0400;
+        }
+        return Z0p0600;
+    }
+
     /// Converts the metallicity to units of dex for the element iron, using several assumptions.
     ///
     /// PARSEC lists metallicity as
@@ -111,5 +157,51 @@ impl Metallicity {
             Metallicity::Z0p0400 => 0.5157001606532141,
             Metallicity::Z0p0600 => 0.6917914197088953,
         }
+    }
+
+    fn find_closest_from_fe_dex(fe_dex: f32) -> Metallicity {
+        if fe_dex < -1.9358448328427578 {
+            return Z0p0001;
+        }
+        if fe_dex < -1.5863598306747484 {
+            return Z0p0002;
+        }
+        if fe_dex < -1.236874828506739 {
+            return Z0p0005;
+        }
+        if fe_dex < -0.9358448328427578 {
+            return Z0p0010;
+        }
+        if fe_dex < -0.6348148371787765 {
+            return Z0p0020;
+        }
+        if fe_dex < -0.3962542098189452 {
+            return Z0p0040;
+        }
+        if fe_dex < -0.24573921198695464 {
+            return Z0p0060;
+        }
+        if fe_dex < -0.1348148371787765 {
+            return Z0p0080;
+        }
+        if fe_dex < -0.013295812835629254 {
+            return Z0p0100;
+        }
+        if fe_dex < 0.10192864785350773 {
+            return Z0p0140;
+        }
+        if fe_dex < 0.17937962784637929 {
+            return Z0p0170;
+        }
+        if fe_dex < 0.30271579451707353 {
+            return Z0p0200;
+        }
+        if fe_dex < 0.45323079234906416 {
+            return Z0p0300;
+        }
+        if fe_dex < 0.6037457901810548 {
+            return Z0p0400;
+        }
+        return Z0p0600;
     }
 }
