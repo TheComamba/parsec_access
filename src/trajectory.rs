@@ -2,17 +2,17 @@ use serde::{Deserialize, Serialize};
 use simple_si_units::base::{Mass, Time};
 use std::ops::Index;
 
-use super::line::ParsedParsecLine;
+use super::line::ParsecLine;
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct Trajectory {
-    params: Vec<ParsedParsecLine>,
+    params: Vec<ParsecLine>,
     pub initial_mass: Mass<f64>,
     pub lifetime: Time<f64>,
 }
 
 impl Index<usize> for Trajectory {
-    type Output = ParsedParsecLine;
+    type Output = ParsecLine;
 
     fn index(&self, index: usize) -> &Self::Output {
         &self.params[index]
@@ -20,7 +20,7 @@ impl Index<usize> for Trajectory {
 }
 
 impl Trajectory {
-    pub(super) fn new(params: Vec<ParsedParsecLine>) -> Self {
+    pub(super) fn new(params: Vec<ParsecLine>) -> Self {
         let initial_mass = params[0].mass;
         let lifetime = match params.last() {
             Some(last) => last.age,
@@ -34,11 +34,11 @@ impl Trajectory {
         }
     }
 
-    pub(super) fn get_params_by_index(&self, index: usize) -> Option<&ParsedParsecLine> {
+    pub(super) fn get_params_by_index(&self, index: usize) -> Option<&ParsecLine> {
         self.params.get(index)
     }
 
-    pub(super) fn get_params_by_index_unchecked(&self, index: usize) -> &ParsedParsecLine {
+    pub(super) fn get_params_by_index_unchecked(&self, index: usize) -> &ParsecLine {
         &self.params[index]
     }
 
@@ -76,7 +76,7 @@ impl Trajectory {
     // }
 
     #[cfg(test)]
-    pub(super) fn get_params(&self) -> &Vec<ParsedParsecLine> {
+    pub(super) fn get_params(&self) -> &Vec<ParsecLine> {
         &self.params
     }
 

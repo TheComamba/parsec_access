@@ -3,7 +3,7 @@ use simple_si_units::base::{Distance, Luminosity, Mass, Temperature, Time};
 
 use crate::error::ParsecAccessError;
 
-pub(super) struct ParsecLine {
+pub(super) struct RawParsecLine {
     mass: f64,
     age: f64,
     log_l: f64,
@@ -12,7 +12,7 @@ pub(super) struct ParsecLine {
 }
 
 #[derive(Deserialize, Serialize, Clone)]
-pub struct ParsedParsecLine {
+pub struct ParsecLine {
     pub mass: Mass<f64>,
     pub age: Time<f64>,
     pub luminous_intensity: Luminosity<f64>,
@@ -20,7 +20,7 @@ pub struct ParsedParsecLine {
     pub radius: Distance<f64>,
 }
 
-impl ParsedParsecLine {
+impl ParsecLine {
     const MASS_INDEX: usize = 1;
     const AGE_INDEX: usize = 2;
     const LOG_L_INDEX: usize = 3;
@@ -52,7 +52,7 @@ impl ParsedParsecLine {
             log_te_entry.parse::<f64>(),
             log_r_entry.parse::<f64>(),
         ) {
-            let parsec_line = ParsecLine {
+            let parsec_line = RawParsecLine {
                 mass,
                 age,
                 log_l,
@@ -70,11 +70,11 @@ impl ParsedParsecLine {
     }
 }
 
-impl ParsecLine {
-    fn parse(self) -> ParsedParsecLine {
+impl RawParsecLine {
+    fn parse(self) -> ParsecLine {
         pub const SOLAR_LUMINOUS_INTENSITY: Luminosity<f64> = Luminosity { cd: 2.98e27 };
 
-        ParsedParsecLine {
+        ParsecLine {
             mass: Mass::from_solar_mass(self.mass),
             age: Time::from_yr(self.age),
             luminous_intensity: 10f64.powf(self.log_l) * SOLAR_LUMINOUS_INTENSITY,

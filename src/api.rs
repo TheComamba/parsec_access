@@ -2,7 +2,7 @@ use simple_si_units::base::{Mass, Time};
 
 use crate::{
     access::{data::ParsecData, metallicity::Metallicity},
-    line::ParsedParsecLine,
+    line::ParsecLine,
     trajectory::Trajectory,
 };
 
@@ -26,7 +26,7 @@ pub fn getParameters(
     metallicity: &Metallicity,
     mass_index: usize,
     age_index: usize,
-) -> &'static ParsedParsecLine {
+) -> &'static ParsecLine {
     todo!()
 }
 
@@ -34,6 +34,6 @@ pub fn getClosestParameters(
     mass_fraction: f64,
     mass: Mass<f64>,
     age: Time<f64>,
-) -> &'static ParsedParsecLine {
+) -> &'static ParsecLine {
     todo!()
 }

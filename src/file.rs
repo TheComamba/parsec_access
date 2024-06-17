@@ -12,7 +12,7 @@ use crate::access::masses::get_filenames;
 use crate::access::metallicity::Metallicity;
 use crate::access::PARSEC_URL;
 use crate::error::ParsecAccessError;
-use crate::line::ParsedParsecLine;
+use crate::line::ParsecLine;
 use crate::trajectory::Trajectory;
 use crate::{PACKAGE_NAME, PACKAGE_VERSION};
 
@@ -56,7 +56,7 @@ fn read_trajectory_file(file_path: PathBuf) -> Result<Trajectory, ParsecAccessEr
     for line in reader.lines() {
         let line = line.map_err(ParsecAccessError::Io)?;
         if !is_header(&line) {
-            let line = ParsedParsecLine::read(line)?;
+            let line = ParsecLine::read(line)?;
             lines.push(line);
         }
     }
