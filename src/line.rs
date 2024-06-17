@@ -12,12 +12,12 @@ pub(super) struct ParsecLine {
 }
 
 #[derive(Deserialize, Serialize, Clone)]
-pub(crate) struct ParsedParsecLine {
-    pub(super) mass_in_solar_masses: f64,
-    pub(super) age_in_years: f64,
-    pub(super) luminous_intensity_in_solar: f64,
-    pub(super) temperature_in_kelvin: f64,
-    pub(super) radius_in_solar_radii: f64,
+pub struct ParsedParsecLine {
+    pub mass_in_solar_masses: f64,
+    pub age_in_years: f64,
+    pub luminous_intensity_in_solar: f64,
+    pub temperature_in_kelvin: f64,
+    pub radius_in_solar_radii: f64,
 }
 
 impl ParsedParsecLine {

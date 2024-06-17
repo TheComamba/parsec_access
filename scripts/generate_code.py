@@ -18,7 +18,7 @@ MOD_TEMPLATE = """
 
 pub(crate) const PARSEC_URL: &str = "{URL}";
 
-pub(crate) mod data;
+pub mod data;
 pub mod metallicity;
 pub mod masses;
 """

@@ -5,10 +5,10 @@ use std::ops::Index;
 use super::line::ParsedParsecLine;
 
 #[derive(Deserialize, Serialize, Clone)]
-pub(super) struct Trajectory {
+pub struct Trajectory {
     params: Vec<ParsedParsecLine>,
-    pub(super) initial_mass: Mass<f64>,
-    pub(super) lifetime: Time<f64>,
+    pub initial_mass: Mass<f64>,
+    pub lifetime: Time<f64>,
 }
 
 impl Index<usize> for Trajectory {
