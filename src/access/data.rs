@@ -79,6 +79,8 @@ impl Index<usize> for ParsecData {
 
 #[cfg(test)]
 mod tests {
+    use simple_si_units::base::Mass;
+
     use super::*;
 
     #[test]
@@ -106,10 +108,9 @@ mod tests {
 
         // Access the data in a pseudo-random order.
         let now = std::time::Instant::now();
-        let mut total_mass = 0.;
+        let mut total_mass = Mass { kg: 0. };
         for (metallicity_index, mass_index, trajectory_index) in indices {
-            let m = DATA[metallicity_index].as_ref().unwrap()[mass_index][trajectory_index]
-                .mass_in_solar_masses;
+            let m = DATA[metallicity_index].as_ref().unwrap()[mass_index][trajectory_index].mass;
             total_mass += m;
         }
         let elapsed = now.elapsed();
