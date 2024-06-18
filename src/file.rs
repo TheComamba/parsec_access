@@ -7,7 +7,7 @@ use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::path::PathBuf;
 use tar::Archive;
 
-use crate::access::masses::get_filenames;
+use crate::access::masses::FILENAMES;
 use crate::access::metallicity::{
     METALLICITIES_IN_MASS_FRACTION, METALLICITY_ARCHIVES, METALLICITY_NAMES,
 };
@@ -113,7 +113,7 @@ fn read_parsec_data_from_files(
     ensure_data_files(metallicity_index)?;
     let data_dir_name = METALLICITY_ARCHIVES[metallicity_index].replace(".tar.gz", "");
     let folder_path = data_dir.join(PathBuf::from(data_dir_name));
-    let filepaths = get_filenames(metallicity_index);
+    let filepaths = FILENAMES[metallicity_index];
     let mut parsec_data = ParsecData {
         metallicity_in_mass_fraction: METALLICITIES_IN_MASS_FRACTION[metallicity_index],
         data: Vec::new(),
