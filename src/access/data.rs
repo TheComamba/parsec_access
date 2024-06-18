@@ -69,6 +69,16 @@ pub(crate) struct ParsecData {
     pub(crate) data: Vec<Trajectory>,
 }
 
+impl ParsecData {
+    pub(crate) fn is_filled(&self) -> bool {
+        let mut is_filled = !self.data.is_empty();
+        for trajectory in self.data.iter() {
+            is_filled = is_filled && !trajectory.is_empty();
+        }
+        is_filled
+    }
+}
+
 impl Index<usize> for ParsecData {
     type Output = Trajectory;
 

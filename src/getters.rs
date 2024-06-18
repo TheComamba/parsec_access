@@ -1,31 +1,68 @@
-use crate::access::data::ParsecData;
+//! Provides a set of api functions exposing the main functionality of this crate.
 
-impl ParsecData {
-    pub(super) fn find_closest_index(list: &[f64], mass: f64) -> usize {
-        let mut min_index = 0;
-        let mut max_index = list.len() - 1;
-        while max_index - min_index > 1 {
-            let mid_index = (max_index + min_index) / 2;
-            let mid_mass = list[mid_index];
-            if mass > mid_mass {
-                min_index = mid_index;
-            } else {
-                max_index = mid_index;
-            }
-        }
-        if (mass - list[min_index]).abs() < (mass - list[max_index]).abs() {
-            min_index
+use simple_si_units::base::{Mass, Time};
+
+use crate::{
+    access::{data::ParsecData, metallicity::Metallicity},
+    line::ParsecLine,
+    trajectory::Trajectory,
+};
+
+/// Fetches a reference to the ParsecData object for a given metallicity.
+/// This is functionally similar to getClosestData, but much faster.
+// Todo Example
+pub fn getData(metallicity: &Metallicity) -> &'static ParsecData {
+    todo!()
+}
+
+/// Fetches a reference to the ParsecData object for the metallicity that is closest to the provided value.
+/// The untyped input value is expected to be a mass fraction of all metals to total mass.
+/// This is a convenience wrapper around the much faster getData().
+// Todo Example
+pub fn getClosestData(mass_fraction: f64) -> &'static ParsecData {
+    todo!()
+}
+
+pub fn getTrajectory(metallicity: &Metallicity, mass_index: usize) -> &'static Trajectory {
+    todo!()
+}
+
+pub fn getClosestTrajectory(mass_fraction: f64, mass: Mass<f64>) -> &'static Trajectory {
+    todo!()
+}
+
+pub fn getParameters(
+    metallicity: &Metallicity,
+    mass_index: usize,
+    age_index: usize,
+) -> &'static ParsecLine {
+    todo!()
+}
+
+pub fn getClosestParameters(
+    mass_fraction: f64,
+    mass: Mass<f64>,
+    age: Time<f64>,
+) -> &'static ParsecLine {
+    todo!()
+}
+
+pub(super) fn get_closest_index(list: &[f64], mass: f64) -> usize {
+    let mut min_index = 0;
+    let mut max_index = list.len() - 1;
+    while max_index - min_index > 1 {
+        let mid_index = (max_index + min_index) / 2;
+        let mid_mass = list[mid_index];
+        if mass > mid_mass {
+            min_index = mid_index;
         } else {
-            max_index
+            max_index = mid_index;
         }
     }
-
-    pub(super) fn is_filled(&self) -> bool {
-        let mut is_filled = !self.data.is_empty();
-        for trajectory in self.data.iter() {
-            is_filled = is_filled && !trajectory.is_empty();
-        }
-        is_filled
+    if (mass - list[min_index]).abs() < (mass - list[max_index]).abs() {
+        min_index
+    } else {
+        max_index
     }
 }
 
