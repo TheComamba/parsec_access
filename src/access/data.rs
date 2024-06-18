@@ -2,28 +2,28 @@
 
 use lazy_static::lazy_static;
 
-use crate::{data::ParsecData, error::ParsecAccessError};
+use crate::data::ParsecData;
 
 lazy_static! {
-    static ref Z0_0001_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(0);
-    static ref Z0_0002_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(1);
-    static ref Z0_0005_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(2);
-    static ref Z0_0010_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(3);
-    static ref Z0_0020_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(4);
-    static ref Z0_0040_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(5);
-    static ref Z0_0060_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(6);
-    static ref Z0_0080_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(7);
-    static ref Z0_0100_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(8);
-    static ref Z0_0140_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(9);
-    static ref Z0_0170_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(10);
-    static ref Z0_0200_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(11);
-    static ref Z0_0300_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(12);
-    static ref Z0_0400_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(13);
-    static ref Z0_0600_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(14);
+    static ref Z0_0001_DATA: ParsecData = ParsecData::new(0);
+    static ref Z0_0002_DATA: ParsecData = ParsecData::new(1);
+    static ref Z0_0005_DATA: ParsecData = ParsecData::new(2);
+    static ref Z0_0010_DATA: ParsecData = ParsecData::new(3);
+    static ref Z0_0020_DATA: ParsecData = ParsecData::new(4);
+    static ref Z0_0040_DATA: ParsecData = ParsecData::new(5);
+    static ref Z0_0060_DATA: ParsecData = ParsecData::new(6);
+    static ref Z0_0080_DATA: ParsecData = ParsecData::new(7);
+    static ref Z0_0100_DATA: ParsecData = ParsecData::new(8);
+    static ref Z0_0140_DATA: ParsecData = ParsecData::new(9);
+    static ref Z0_0170_DATA: ParsecData = ParsecData::new(10);
+    static ref Z0_0200_DATA: ParsecData = ParsecData::new(11);
+    static ref Z0_0300_DATA: ParsecData = ParsecData::new(12);
+    static ref Z0_0400_DATA: ParsecData = ParsecData::new(13);
+    static ref Z0_0600_DATA: ParsecData = ParsecData::new(14);
 }
 
 lazy_static! {
-    static ref DATA: [&'static Result<ParsecData, ParsecAccessError>; 15] = [
+    static ref DATA: [&'static ParsecData; 15] = [
         &Z0_0001_DATA,
         &Z0_0002_DATA,
         &Z0_0005_DATA,

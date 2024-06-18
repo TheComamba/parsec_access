@@ -83,7 +83,7 @@ pub(crate) fn create_parsec_data_file(
     let parsec_data = read_parsec_data_from_files(metallicity_index, data_dir)?;
     save_parsec_data_to_file(file_path, &parsec_data)?;
     delete_data_files(metallicity_index)?;
-    if parsec_data.is_filled() {
+    if parsec_data.is_valid() {
         Ok(parsec_data)
     } else {
         let metallicity = METALLICITY_NAMES[metallicity_index];
@@ -132,7 +132,7 @@ pub(crate) fn read_existing_parsec_file(
     let file = File::open(file_path).map_err(ParsecAccessError::Io)?;
     let parsec_data: ParsecData =
         rmp_serde::from_read(file).map_err(ParsecAccessError::RmpDeserialization)?;
-    if parsec_data.is_filled() {
+    if parsec_data.is_valid() {
         Ok(parsec_data)
     } else {
         Err(ParsecAccessError::DataNotAvailable(

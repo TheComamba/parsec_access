@@ -26,14 +26,14 @@ DATA_TEMPLATE = """
 
 use lazy_static::lazy_static;
 
-use crate::{{data::ParsecData, error::ParsecAccessError}};
+use crate::data::ParsecData;
 
 lazy_static! {{
     {static_data}
 }}
 
 lazy_static! {{
-    static ref DATA: [&'static Result<ParsecData, ParsecAccessError>; {array_size}] = [
+    static ref DATA: [&'static ParsecData; {array_size}] = [
         {access_array}
     ];
 }}
@@ -180,9 +180,7 @@ def generate_data_file(metallicities):
     access_array = ""
     for index, metallicity in enumerate(metallicities):
         variant_name = metallicity_variant_name(metallicity)
-        static_data += f"static {variant_name}_DATA:"
-        static_data += "Result<ParsecData, ParsecAccessError> = "
-        static_data += f"ParsecData::new({index});\n"
+        static_data += f"static {variant_name}_DATA: ParsecData = ParsecData::new({index});\n"
         access_array += f"&{variant_name}_DATA,\n"
 
     with open(TARGET_DIR + "data.rs", 'w') as f:

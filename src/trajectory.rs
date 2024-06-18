@@ -33,7 +33,7 @@ impl Trajectory {
             params,
             initial_mass,
             lifetime,
-            ages_in_years
+            ages_in_years,
         }
     }
 

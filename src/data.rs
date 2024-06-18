@@ -3,7 +3,6 @@ use std::ops::Index;
 
 use crate::{
     access::metallicity::METALLICITY_NAMES,
-    error::ParsecAccessError,
     file::{create_parsec_data_file, get_data_dir, read_existing_parsec_file},
     trajectory::Trajectory,
 };
@@ -15,24 +14,54 @@ pub struct ParsecData {
 }
 
 impl ParsecData {
-    pub(crate) fn new(metallicity_index: usize) -> Result<ParsecData, ParsecAccessError> {
-        let data_dir = get_data_dir()?;
+    pub(crate) fn new(metallicity_index: usize) -> ParsecData {
+        let data_dir = match get_data_dir() {
+            Ok(dir) => dir,
+            Err(err) => {
+                eprintln!("Error getting data directory: {}", err);
+                return ParsecData::default();
+            }
+        };
         let metallicity_name = METALLICITY_NAMES[metallicity_index].to_string();
         let file_path = data_dir.join(metallicity_name + ".rmp");
 
-        if file_path.exists() {
+        let result = if file_path.exists() {
             read_existing_parsec_file(file_path)
         } else {
             create_parsec_data_file(metallicity_index, &data_dir, file_path)
+        };
+        match result {
+            Ok(data) => data,
+            Err(err) => {
+                eprintln!("Error reading PARSEC data: {}", err);
+                ParsecData::default()
+            }
         }
     }
 
-    pub(crate) fn is_filled(&self) -> bool {
-        let mut is_filled = !self.data.is_empty();
-        for trajectory in self.data.iter() {
-            is_filled = is_filled && !trajectory.is_empty();
+    pub(crate) fn is_valid(&self) -> bool {
+        let has_valid_metallicity = self.metallicity_in_mass_fraction > 0.0;
+        if !has_valid_metallicity {
+            return false;
         }
-        is_filled
+        if self.data.is_empty() {
+            return false;
+        }
+        for trajectory in self.data.iter() {
+            if trajectory.is_empty() {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+impl Default for ParsecData {
+    fn default() -> Self {
+        Self {
+            metallicity_in_mass_fraction: 0.0,
+            data: Vec::new(),
+        }
     }
 }
 
