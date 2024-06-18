@@ -91,9 +91,9 @@ mod tests {{
 
         // Access the data in a pseudo-random order.
         let now = std::time::Instant::now();
-        let mut total_mass = Mass { kg: 0. };
+        let mut total_mass = Mass {{ kg: 0. }};
         for (metallicity_index, mass_index, trajectory_index) in indices {{
-            let m = DATA[metallicity_index].as_ref().unwrap()[mass_index][trajectory_index].mass_in_solar_masses;
+            let m = DATA[metallicity_index].as_ref().unwrap()[mass_index][trajectory_index].mass;
             total_mass += m;
         }}
         let elapsed = now.elapsed();
@@ -259,7 +259,15 @@ def assure_dev_data_folder():
         os.makedirs('dev_data')
 
 def collect_archive_names():
-    web_page = requests.get(URL).text
+    FILE_PATH = "dev_data/archive_names.html"
+    if not os.path.isfile(FILE_PATH):
+        web_page = requests.get(URL).text
+        with open(FILE_PATH, 'w') as file:
+            file.write(web_page)
+
+    with open(FILE_PATH, 'r') as file:
+        web_page = file.read()
+
     soup = BeautifulSoup(web_page, 'html.parser')
     archive_names = []
     for link in soup.find_all('a'):
