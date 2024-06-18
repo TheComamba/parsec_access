@@ -3,7 +3,10 @@
 use simple_si_units::base::{Mass, Time};
 
 use crate::{
-    access::{data::ParsecData, metallicity::Metallicity},
+    access::{
+        data::ParsecData,
+        metallicity::{METALLICITIES_IN_DEX, METALLICITIES_IN_MASS_FRACTION},
+    },
     line::ParsecLine,
     trajectory::Trajectory,
 };
@@ -29,7 +32,7 @@ pub fn is_data_ready() -> bool {
 /// Call is_data_ready() once before using this function to ensure that the data is loaded and valid.
 ///
 // Todo Example
-pub fn getData(metallicity: &Metallicity) -> &'static ParsecData {
+pub fn getData(metallicity_index: usize) -> &'static ParsecData {
     todo!()
 }
 
@@ -41,7 +44,7 @@ pub fn getClosestData(mass_fraction: f64) -> &'static ParsecData {
     todo!()
 }
 
-pub fn getTrajectory(metallicity: &Metallicity, mass_index: usize) -> &'static Trajectory {
+pub fn getTrajectory(metallicity_index: usize, mass_index: usize) -> &'static Trajectory {
     todo!()
 }
 
@@ -50,7 +53,7 @@ pub fn getClosestTrajectory(mass_fraction: f64, mass: Mass<f64>) -> &'static Tra
 }
 
 pub fn getParameters(
-    metallicity: &Metallicity,
+    metallicity_index: usize,
     mass_index: usize,
     age_index: usize,
 ) -> &'static ParsecLine {
@@ -63,6 +66,51 @@ pub fn getClosestParameters(
     age: Time<f64>,
 ) -> &'static ParsecLine {
     todo!()
+}
+
+/// Returns a reference to the array of available metallicities in units of mass fractions Z.
+///
+/// # Example
+/// ```
+/// use parsec_access::access::metallicity::get_metallicities;
+///
+/// for metallicity in get_metallicities() {{
+///     println!("Metallicity: {{}}", metallicity);
+/// }}
+/// ```
+pub fn get_metallicities_in_mass_fractions() -> &'static [f64] {
+    &METALLICITIES_IN_MASS_FRACTION
+}
+
+/// Converts the metallicity to units of dex for the element iron, using several assumptions.
+///
+/// PARSEC lists metallicity as
+/// Z = m_M / m_tot ,
+/// the mass fraction of all metals (i.e. elements heavier than Helium) in the star.
+///
+/// The chemical abundance ratio on the other hand is conventionally given as
+/// [Fe/H] = log10(N_Fe / N_H) - log10(N_Fe / N_H)_sun ,
+/// where N_Fe and N_H are the number densities of iron and hydrogen atoms, respectively.
+///
+/// Assuming that iron always makes up more or less the same fraction of the total mass,
+/// N_Fe = a * m_M
+/// and that the total mass is dominated by hydrogen,
+/// N_H = m_tot ,
+/// we find
+/// [Fe/H] = log10(a * m_M / m_tot) - log10(a * m_M / m_tot)_sun
+///        = log10(Z / Z_sun) .
+///
+/// The solar metallicity is Z_sun = 0.0122.
+///
+/// # Example
+/// ```
+/// use parsec_access::access::metallicity::Metallicity;
+///
+/// let dex = Metallicity::Z0_0100.to_fe_dex();
+/// assert!((dex + 0.086).abs() < 1e-3);
+/// ```
+pub fn get_metallicities_in_fe_dex() -> &'static [f64] {
+    &METALLICITIES_IN_DEX
 }
 
 /// Finds the closest metallicity enum variant to the given mass fraction Z.
@@ -81,7 +129,7 @@ pub fn getClosestParameters(
 /// let closest = Metallicity::find_closest_from_mass_fraction(0.999);
 /// assert_eq!(closest, Metallicity::Z0_0600);
 /// ```
-pub fn get_closest_metallicity_from_mass_fraction(mass_fraction: f32) -> Metallicity {
+pub fn get_closest_metallicity_index_from_mass_fraction(mass_fraction: f32) -> usize {
     todo!()
 }
 
@@ -95,25 +143,21 @@ pub fn get_closest_metallicity_from_mass_fraction(mass_fraction: f32) -> Metalli
 /// use parsec_access::access::metallicity::Metallicity;
 ///
 /// let closest = Metallicity::find_closest_from_fe_dex(0.);
-/// assert_eq!(closest, Metallicity::Z0_0140, "The sun should have a metallicity of roughlty Z = 0.0122. The test found {{}}", closest.to_mass_fraction());
+/// assert_eq!(closest, Metallicity::Z0_0140, "The sun should have a metallicity of roughlty Z = 0.0122. The test found {}", closest.to_mass_fraction());
 /// let closest = Metallicity::find_closest_from_fe_dex(-10.);
-/// assert_eq!(closest, Metallicity::Z0_0001, "The lowest metallicity should be Z = 0.0001. The test found {{}}", closest.to_mass_fraction());
+/// assert_eq!(closest, Metallicity::Z0_0001, "The lowest metallicity should be Z = 0.0001. The test found {}", closest.to_mass_fraction());
 /// let closest = Metallicity::find_closest_from_fe_dex(10.);
-/// assert_eq!(closest, Metallicity::Z0_0600, "The highest metallicity should be Z = 0.06. The test found {{}}", closest.to_mass_fraction());
+/// assert_eq!(closest, Metallicity::Z0_0600, "The highest metallicity should be Z = 0.06. The test found {}", closest.to_mass_fraction());
 /// ```
-pub fn get_closest_metallicity_from_fe_dex(fe_dex: f32) -> Metallicity {
+pub fn get_closest_metallicity_index_from_fe_dex(fe_dex: f32) -> usize {
     todo!()
 }
 
-pub fn get_closest_mass_index(metallicity: &Metallicity, mass: Mass<f64>) -> usize {
+pub fn get_closest_mass_index(metallicity_index: usize, mass: Mass<f64>) -> usize {
     todo!()
 }
 
-pub fn get_closest_age_index(
-    metallicity: &Metallicity,
-    mass_index: usize,
-    age: Time<f64>,
-) -> usize {
+pub fn get_closest_age_index(metallicity_index: usize, mass_index: usize, age: Time<f64>) -> usize {
     todo!()
 }
 

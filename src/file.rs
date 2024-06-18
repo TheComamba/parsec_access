@@ -9,7 +9,7 @@ use tar::Archive;
 
 use crate::access::data::ParsecData;
 use crate::access::masses::get_filenames;
-use crate::access::metallicity::Metallicity;
+use crate::access::metallicity::{METALLICITY_ARCHIVES, METALLICITY_NAMES};
 use crate::access::PARSEC_URL;
 use crate::error::ParsecAccessError;
 use crate::line::ParsecLine;
@@ -17,19 +17,20 @@ use crate::trajectory::Trajectory;
 use crate::{PACKAGE_NAME, PACKAGE_VERSION};
 
 impl ParsecData {
-    pub(crate) fn new(metallicity: Metallicity) -> Result<ParsecData, ParsecAccessError> {
+    pub(crate) fn new(metallicity_index: usize) -> Result<ParsecData, ParsecAccessError> {
         let data_dir = get_data_dir()?;
-        let file_path = data_dir.join(metallicity.to_string() + ".rmp");
+        let metallicity_name = METALLICITY_NAMES[metallicity_index].to_string();
+        let file_path = data_dir.join(metallicity_name + ".rmp");
 
         if file_path.exists() {
             read_existing_parsec_file(file_path)
         } else {
-            create_parsec_data_file(metallicity, &data_dir, file_path)
+            create_parsec_data_file(metallicity_index, &data_dir, file_path)
         }
     }
 }
 
-fn download(metallicity: &Metallicity) -> Result<(), ParsecAccessError> {
+fn download(metallicity_index: usize) -> Result<(), ParsecAccessError> {
     let data_dir = get_data_dir()?;
     let data_dir = data_dir
         .to_str()
@@ -37,11 +38,12 @@ fn download(metallicity: &Metallicity) -> Result<(), ParsecAccessError> {
             std::io::ErrorKind::Other,
             "Could not convert data dir to string",
         )))?;
+    let archive_name = METALLICITY_ARCHIVES[metallicity_index];
     println!(
-        "Downloading PARSEC data for {} to {}",
-        metallicity, data_dir
+        "Downloading PARSEC data archive {} to {}",
+        archive_name, data_dir
     );
-    let target = PARSEC_URL.to_string() + metallicity.to_archive_name();
+    let target = PARSEC_URL.to_string() + archive_name;
     let mut response = reqwest::blocking::get(target).map_err(ParsecAccessError::Connection)?;
     let gz_decoder = GzDecoder::new(&mut response);
     let mut archive = Archive::new(gz_decoder);
@@ -63,19 +65,19 @@ fn read_trajectory_file(file_path: PathBuf) -> Result<Trajectory, ParsecAccessEr
     Ok(Trajectory::new(lines))
 }
 
-fn ensure_data_files(metallicity: &Metallicity) -> Result<(), ParsecAccessError> {
+fn ensure_data_files(metallicity_index: usize) -> Result<(), ParsecAccessError> {
     let data_dir = get_data_dir()?;
-    let dirname = metallicity.to_archive_name().replace(".tar.gz", "");
+    let dirname = METALLICITY_ARCHIVES[metallicity_index].replace(".tar.gz", "");
     let path = data_dir.join(PathBuf::from(dirname));
     if !path.exists() {
-        download(metallicity)?;
+        download(metallicity_index)?;
     }
     Ok(())
 }
 
-fn delete_data_files(metallicity: &Metallicity) -> Result<(), ParsecAccessError> {
+fn delete_data_files(metallicity_index: usize) -> Result<(), ParsecAccessError> {
     let data_dir = get_data_dir()?;
-    let dirname = metallicity.to_archive_name().replace(".tar.gz", "");
+    let dirname = METALLICITY_ARCHIVES[metallicity_index].replace(".tar.gz", "");
     let path = data_dir.join(PathBuf::from(dirname));
     if path.exists() {
         fs::remove_dir_all(path).map_err(ParsecAccessError::Io)?;
@@ -84,16 +86,17 @@ fn delete_data_files(metallicity: &Metallicity) -> Result<(), ParsecAccessError>
 }
 
 fn create_parsec_data_file(
-    metallicity: Metallicity,
+    metallicity_index: usize,
     data_dir: &PathBuf,
     file_path: PathBuf,
 ) -> Result<ParsecData, ParsecAccessError> {
-    let parsec_data = read_parsec_data_from_files(metallicity, data_dir)?;
+    let parsec_data = read_parsec_data_from_files(metallicity_index, data_dir)?;
     save_parsec_data_to_file(file_path, &parsec_data)?;
-    delete_data_files(&metallicity)?;
+    delete_data_files(metallicity_index)?;
     if parsec_data.is_filled() {
         Ok(parsec_data)
     } else {
+        let metallicity = METALLICITY_NAMES[metallicity_index];
         Err(ParsecAccessError::DataNotAvailable(format!(
             "Parsec Data for metallicity {} is empty.",
             metallicity
@@ -114,15 +117,15 @@ fn save_parsec_data_to_file(
 }
 
 fn read_parsec_data_from_files(
-    metallicity: Metallicity,
+    metallicity_index: usize,
     data_dir: &PathBuf,
 ) -> Result<ParsecData, ParsecAccessError> {
-    ensure_data_files(&metallicity)?;
-    let data_dir_name = metallicity.to_archive_name().replace(".tar.gz", "");
+    ensure_data_files(metallicity_index)?;
+    let data_dir_name = METALLICITY_ARCHIVES[metallicity_index].replace(".tar.gz", "");
     let folder_path = data_dir.join(PathBuf::from(data_dir_name));
-    let filepaths = get_filenames(&metallicity);
+    let filepaths = get_filenames(metallicity_index);
     let mut parsec_data = ParsecData {
-        metallicity,
+        metallicity_index,
         data: Vec::new(),
     };
     for mass_index in 0..filepaths.len() {
