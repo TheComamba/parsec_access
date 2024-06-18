@@ -63,6 +63,38 @@ impl fmt::Display for Metallicity {
     }
 }
 
+static METALLICITIES: [Metallicity; 15] = [
+    Metallicity::Z0_0001,
+    Metallicity::Z0_0002,
+    Metallicity::Z0_0005,
+    Metallicity::Z0_0010,
+    Metallicity::Z0_0020,
+    Metallicity::Z0_0040,
+    Metallicity::Z0_0060,
+    Metallicity::Z0_0080,
+    Metallicity::Z0_0100,
+    Metallicity::Z0_0140,
+    Metallicity::Z0_0170,
+    Metallicity::Z0_0200,
+    Metallicity::Z0_0300,
+    Metallicity::Z0_0400,
+    Metallicity::Z0_0600,
+];
+
+/// Returns a reference to the array of available metallicities, for you to loop over.
+///
+/// # Example
+/// ```
+/// use parsec_access::access::metallicity::get_metallicities;
+///
+/// for metallicity in get_metallicities() {
+///     println!("Metallicity: {}", metallicity);
+/// }
+/// ```
+pub fn get_metallicities() -> &'static [Metallicity] {
+    &METALLICITIES
+}
+
 impl Metallicity {
     /// Returns the name of the archive file for the metallicity.
     /// Using this, the crate knows which file to download during intialisation.

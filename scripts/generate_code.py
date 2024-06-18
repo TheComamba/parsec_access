@@ -137,6 +137,24 @@ impl fmt::Display for Metallicity {{
     }}
 }}
 
+static METALLICITIES: [Metallicity; {number_of_metallicities}] = [
+    {metallicities_array}
+];
+
+/// Returns a reference to the array of available metallicities, for you to loop over.
+///
+/// # Example
+/// ```
+/// use parsec_access::access::metallicity::get_metallicities;
+///
+/// for metallicity in get_metallicities() {{
+///     println!("Metallicity: {{}}", metallicity);
+/// }}
+/// ```
+pub fn get_metallicities() -> &'static [Metallicity] {{
+    &METALLICITIES
+}}
+
 impl Metallicity {{
     /// Returns the name of the archive file for the metallicity.
     /// Using this, the crate knows which file to download during intialisation.
@@ -404,6 +422,7 @@ def metallicity_variant_name(metallicity):
 def generate_metallicity_file(metallicities, metallicity_to_archive_name):
     enum_str = ""
     display_impl = ""
+    array_str = ""
     to_archive_str = ""
     to_mass_fraction_str = ""
     to_dex_str = ""
@@ -412,6 +431,7 @@ def generate_metallicity_file(metallicities, metallicity_to_archive_name):
     for metallicity in metallicities:
         enum_comment = "/// Metallic mass fraction Z = " + metallicity
         variant_name = metallicity_variant_name(metallicity)
+        array_str += f"Metallicity::{variant_name},\n"
         archive_name = metallicity_to_archive_name[metallicity]
         mass_fraction = float(metallicity)
         metallicity_and_mass_fraction.append((f"Metallicity::{variant_name}", mass_fraction))
@@ -429,6 +449,8 @@ def generate_metallicity_file(metallicities, metallicity_to_archive_name):
     with open(TARGET_DIR + "metallicity.rs", 'w') as f:
         f.write(METALLICITY_TEMPLATE.format(metallicities=enum_str,
                                             display_impl=display_impl,
+                                            number_of_metallicities=len(metallicities),
+                                            metallicities_array=array_str,
                                             metallicity_to_archive_name=to_archive_str,
                                             metallicity_to_mass_fraction=to_mass_fraction_str,
                                             find_closest_mass_fraction=find_closest_mass_fraction,

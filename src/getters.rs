@@ -9,11 +9,11 @@ use crate::{
 };
 /// Loads the Parsec data and makes sure that it is valid.
 /// This step can and should be used once before accessing the data, because the getter functions do not perform any checks due to performance reasons.
-/// 
+///
 /// # Example
 /// ```
 /// use parsec::getters::is_data_ready();
-/// 
+///
 /// assert!(is_data_ready());
 /// ```
 pub fn is_data_ready() -> bool {
@@ -24,10 +24,10 @@ pub fn is_data_ready() -> bool {
 /// This is functionally similar to getClosestData, but much faster.
 ///
 /// # Safety
-/// 
+///
 /// This function does not perform any out-of-bounds checks.
 /// Call is_data_ready() once before using this function to ensure that the data is loaded and valid.
-/// 
+///
 // Todo Example
 pub fn getData(metallicity: &Metallicity) -> &'static ParsecData {
     todo!()
