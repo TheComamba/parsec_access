@@ -23,7 +23,7 @@ lazy_static! {
 }
 
 lazy_static! {
-    static ref DATA: [&'static ParsecData; 15] = [
+    pub(crate) static ref DATA: [&'static ParsecData; 15] = [
         &Z0_0001_DATA,
         &Z0_0002_DATA,
         &Z0_0005_DATA,

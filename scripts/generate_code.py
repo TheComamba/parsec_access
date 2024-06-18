@@ -33,7 +33,7 @@ lazy_static! {{
 }}
 
 lazy_static! {{
-    static ref DATA: [&'static ParsecData; {array_size}] = [
+    pub(crate) static ref DATA: [&'static ParsecData; {array_size}] = [
         {access_array}
     ];
 }}

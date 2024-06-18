@@ -4,6 +4,7 @@ use simple_si_units::base::{Mass, Time};
 
 use crate::{
     access::{
+        data::DATA,
         masses::MASSES,
         metallicity::{METALLICITIES_IN_DEX, METALLICITIES_IN_MASS_FRACTION},
     },
@@ -22,52 +23,163 @@ use crate::{
 /// assert!(is_data_ready());
 /// ```
 pub fn is_data_ready() -> bool {
-    todo!()
+    for i in 0..METALLICITIES_IN_MASS_FRACTION.len() {
+        if !DATA[i].is_valid() {
+            return false;
+        }
+    }
+    return true;
 }
 
 /// Fetches a reference to the ParsecData object for a given metallicity.
-/// This is functionally similar to getClosestData, but much faster.
+/// This is functionally similar to get_closest_data, but much faster.
+/// To find the correct metallicity index, use get_closest_metallicity_index_from_mass_fraction.
 ///
 /// # Safety
 ///
 /// This function does not perform any out-of-bounds checks.
 /// Call is_data_ready() once before using this function to ensure that the data is loaded and valid.
 ///
-// Todo Example
+/// # Example
+/// ```
+/// use parsec_access::getters::{get_data, is_data_ready};
+/// 
+/// assert!(is_data_ready());
+/// let data = get_data(1);
+/// assert!(data.metallicity_in_mass_fraction > 0.);
+/// let first_trajectory = data[0];
+/// ```
 pub fn get_data(metallicity_index: usize) -> &'static ParsecData {
-    todo!()
+    &DATA[metallicity_index]
 }
 
 /// Fetches a reference to the ParsecData object for the metallicity that is closest to the provided value.
 /// The untyped input value is expected to be a mass fraction of all metals to total mass.
-/// This is a convenience wrapper around the much faster getData().
-// Todo Example
+/// This is a convenience wrapper around the much faster get_data().
+/// 
+/// # Safety
+///
+/// This function does not perform any out-of-bounds checks.
+/// Call is_data_ready() once before using this function to ensure that the data is loaded and valid.
+///
+/// # Example
+/// ```
+/// use parsec_access::getters::{get_closest_data, is_data_ready};
+/// 
+/// assert!(is_data_ready());
+/// let data = get_closest_data(0.01);
+/// assert!(data.metallicity_in_mass_fraction > 0.009);
+/// assert!(data.metallicity_in_mass_fraction < 0.011);
+/// ```
 pub fn get_closest_data(mass_fraction: f64) -> &'static ParsecData {
-    todo!()
+    let metallicity_index = get_closest_metallicity_index_from_mass_fraction(mass_fraction);
+    get_data(metallicity_index)
 }
 
+/// Fetches a reference to the trajectory for a given metallicity and mass.
+/// This is functionally similar to get_closest_trajectory, but much faster.
+/// To find the correct metallicity and mass index, use get_closest_metallicity_index_from_mass_fraction and get_closest_mass_index.
+/// 
+/// # Safety
+/// 
+/// This function does not perform any out-of-bounds checks.
+/// Call is_data_ready() once before using this function to ensure that the data is loaded and valid.
+/// 
+/// # Example
+/// ```
+/// use parsec_access::getters::{get_trajectory, is_data_ready};
+/// 
+/// assert!(is_data_ready());
+/// let trajectory = get_trajectory(1, 2);
+/// assert!(trajectory.initial_mass > 0.);
+/// assert!(trajectory.lifetime > 0.);
+/// ```
 pub fn get_trajectory(metallicity_index: usize, mass_index: usize) -> &'static Trajectory {
-    todo!()
+    &DATA[metallicity_index].data[mass_index]
 }
 
+/// Fetches a reference to the trajectory for the metallicity and mass that are closest to the provided values.
+/// The untyped mass_fraction is expected to be the mass fraction of all metals to total mass.
+/// This is a convenience wrapper around the much faster get_trajectory().
+/// 
+/// # Safety
+/// 
+/// This function does not perform any out-of-bounds checks.
+/// Call is_data_ready() once before using this function to ensure that the data is loaded and valid.
+/// 
+/// # Example
+/// ```
+/// use parsec_access::getters::{get_closest_trajectory, is_data_ready};
+/// 
+/// assert!(is_data_ready());
+/// let trajectory = get_closest_trajectory(0.01, 1.);
+/// assert!(trajectory.initial_mass.to_solar_masses() > 0.9);
+/// assert!(trajectory.initial_mass.to_solar_masses() < 1.1);
+/// ```
 pub fn get_closest_trajectory(mass_fraction: f64, mass: Mass<f64>) -> &'static Trajectory {
-    todo!()
+    let metallicity_index = get_closest_metallicity_index_from_mass_fraction(mass_fraction);
+    let mass_index = get_closest_mass_index(metallicity_index, mass);
+    get_trajectory(metallicity_index, mass_index)
 }
 
+/// Fetches a reference to the ParsecLine object for a given metallicity, mass, and age.
+/// This is functionally similar to get_closest_parameters, but much faster.
+/// To find the correct metallicity, mass, and age index, use get_closest_metallicity_index_from_mass_fraction, get_closest_mass_index, and get_closest_age_index.
+/// 
+/// # Safety
+/// 
+/// This function does not perform any out-of-bounds checks.
+/// Call is_data_ready() once before using this function to ensure that the data is loaded and valid.
+/// 
+/// # Example
+/// ```
+/// use parsec_access::getters::{get_parameters, is_data_ready};
+/// 
+/// assert!(is_data_ready());
+/// let parameters = get_parameters(1, 2, 3);
+/// assert!(parameters.mass.to_solar_masses() > 0.);
+/// assert!(parameters.age.to_yr() > 0.);
+/// assert!(parameters.luminous_intensity.to_cd() > 0.);
+/// assert!(parameters.temperature.to_kelvin() > 0.);
+/// assert!(parameters.radius.to_solar_radii() > 0.);
+/// ```
 pub fn get_parameters(
     metallicity_index: usize,
     mass_index: usize,
     age_index: usize,
 ) -> &'static ParsecLine {
-    todo!()
+    &DATA[metallicity_index].data[mass_index][age_index]
 }
 
+/// Fetches a reference to the ParsecLine object for the metallicity, mass, and age that are closest to the provided values.
+/// The untyped mass_fraction is expected to be the mass fraction of all metals to total mass.
+/// This is a convenience wrapper around the much faster get_parameters().
+/// 
+/// # Safety
+/// 
+/// This function does not perform any out-of-bounds checks.
+/// Call is_data_ready() once before using this function to ensure that the data is loaded and valid.
+/// 
+/// # Example
+/// ```
+/// use parsec_access::getters::{get_closest_parameters, is_data_ready};
+/// 
+/// assert!(is_data_ready());
+/// let parameters = get_closest_parameters(0.01, Mass::from_solar(1.), Time::from_Gyr(1.));
+/// assert!(parameters.mass.to_solar_masses() > Mass::from_solar(0.9));
+/// assert!(parameters.mass.to_solar_masses() < Mass::from_solar(1.1));
+/// assert!(parameters.age.to_yr() > Time::from_Gyr(0.9));
+/// assert!(parameters.age.to_yr() < Time::from_Gyr(1.1));
+/// ```
 pub fn get_closest_parameters(
     mass_fraction: f64,
     mass: Mass<f64>,
     age: Time<f64>,
 ) -> &'static ParsecLine {
-    todo!()
+    let metallicity_index = get_closest_metallicity_index_from_mass_fraction(mass_fraction);
+    let mass_index = get_closest_mass_index(metallicity_index, mass);
+    let age_index = get_closest_age_index(metallicity_index, mass_index, age);
+    get_parameters(metallicity_index, mass_index, age_index)
 }
 
 /// Returns a reference to the array of available metallicities in units of the mass fractions Z.
@@ -76,6 +188,8 @@ pub fn get_closest_parameters(
 /// ```
 /// use parsec_access::getters::get_metallicities_in_mass_fractions;
 ///
+/// assert!(get_metallicities_in_mass_fractions().len() > 0);
+/// 
 /// for metallicity in get_metallicities_in_mass_fractions() {
 ///     println!("Metallicity mass fraction: {}", metallicity);
 /// }
@@ -110,6 +224,8 @@ pub fn get_metallicities_in_mass_fractions() -> &'static [f64] {
 /// ```
 /// use parsec_access::getters::get_metallicities_in_fe_dex;
 ///
+/// assert!(get_metallicities_in_fe_dex().len() > 0);
+/// 
 /// for metallicity in get_metallicities_in_fe_dex() {
 ///     println!("Metallicity fe dex: {}", metallicity);
 /// }

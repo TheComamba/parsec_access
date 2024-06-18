@@ -1,7 +1,7 @@
 #![warn(clippy::unwrap_used)]
 #![warn(missing_docs)]
 
-pub mod access;
+pub(crate) mod access;
 pub mod data;
 pub mod error;
 pub(crate) mod file;
