@@ -4,6 +4,6 @@
 
 pub(crate) const PARSEC_URL: &str = "https://people.sissa.it/~sbressan/CAF09_V1.2S_M36_LT/";
 
-pub mod data;
-pub mod masses;
-pub mod metallicity;
+pub(crate) mod data;
+pub(crate) mod masses;
+pub(crate) mod metallicity;

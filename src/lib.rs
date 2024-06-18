@@ -2,6 +2,7 @@
 #![warn(missing_docs)]
 
 pub mod access;
+pub mod data;
 pub mod error;
 pub(crate) mod file;
 pub(crate) mod getters;

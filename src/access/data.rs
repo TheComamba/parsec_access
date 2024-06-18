@@ -3,44 +3,25 @@
 //! Provides access to the data files for the PARSEC stellar evolution models.
 
 use lazy_static::lazy_static;
-use serde::{Deserialize, Serialize};
-use std::ops::Index;
 
-use crate::{error::ParsecAccessError, trajectory::Trajectory};
-
-use super::metallicity::Metallicity;
+use crate::{data::ParsecData, error::ParsecAccessError};
 
 lazy_static! {
-    static ref Z0_0001_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0001);
-    static ref Z0_0002_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0002);
-    static ref Z0_0005_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0005);
-    static ref Z0_0010_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0010);
-    static ref Z0_0020_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0020);
-    static ref Z0_0040_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0040);
-    static ref Z0_0060_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0060);
-    static ref Z0_0080_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0080);
-    static ref Z0_0100_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0100);
-    static ref Z0_0140_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0140);
-    static ref Z0_0170_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0170);
-    static ref Z0_0200_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0200);
-    static ref Z0_0300_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0300);
-    static ref Z0_0400_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0400);
-    static ref Z0_0600_DATA: Result<ParsecData, ParsecAccessError> =
-        ParsecData::new(Metallicity::Z0_0600);
+    static ref Z0_0001_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(0);
+    static ref Z0_0002_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(1);
+    static ref Z0_0005_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(2);
+    static ref Z0_0010_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(3);
+    static ref Z0_0020_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(4);
+    static ref Z0_0040_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(5);
+    static ref Z0_0060_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(6);
+    static ref Z0_0080_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(7);
+    static ref Z0_0100_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(8);
+    static ref Z0_0140_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(9);
+    static ref Z0_0170_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(10);
+    static ref Z0_0200_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(11);
+    static ref Z0_0300_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(12);
+    static ref Z0_0400_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(13);
+    static ref Z0_0600_DATA: Result<ParsecData, ParsecAccessError> = ParsecData::new(14);
 }
 
 lazy_static! {
@@ -61,71 +42,4 @@ lazy_static! {
         &Z0_0400_DATA,
         &Z0_0600_DATA,
     ];
-}
-
-#[derive(Deserialize, Serialize)]
-pub(crate) struct ParsecData {
-    pub metallicity: Metallicity,
-    pub(crate) data: Vec<Trajectory>,
-}
-
-impl ParsecData {
-    pub(crate) fn is_filled(&self) -> bool {
-        let mut is_filled = !self.data.is_empty();
-        for trajectory in self.data.iter() {
-            is_filled = is_filled && !trajectory.is_empty();
-        }
-        is_filled
-    }
-}
-
-impl Index<usize> for ParsecData {
-    type Output = Trajectory;
-
-    fn index(&self, index: usize) -> &Self::Output {
-        &self.data[index]
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use simple_si_units::base::Mass;
-
-    use super::*;
-
-    #[test]
-    #[ignore]
-    fn data_access_is_fast() {
-        const N: usize = 1e6 as usize;
-        const PRIME1: usize = 1009;
-        const PRIME2: usize = 1013;
-        const PRIME3: usize = 10007;
-        const MAX_METALLICITY_INDEX: usize = 10;
-        const MAX_MASS_INDEX: usize = 50;
-        const MAX_TRAJECTORY_INDEX: usize = 100;
-
-        // Ensure that the data is loaded into memory.
-        let _ = DATA[1].as_ref().unwrap()[1][1];
-
-        // Create pseudo-random indices.
-        let mut indices = Vec::new();
-        for i in 0..N {
-            let metallicity_index = (i * PRIME1) % MAX_METALLICITY_INDEX;
-            let mass_index = (i * PRIME2) % MAX_MASS_INDEX;
-            let trajectory_index = (i * PRIME3) % MAX_TRAJECTORY_INDEX;
-            indices.push((metallicity_index, mass_index, trajectory_index));
-        }
-
-        // Access the data in a pseudo-random order.
-        let now = std::time::Instant::now();
-        let mut total_mass = Mass { kg: 0. };
-        for (metallicity_index, mass_index, trajectory_index) in indices {
-            let m = DATA[metallicity_index].as_ref().unwrap()[mass_index][trajectory_index].mass;
-            total_mass += m;
-        }
-        let elapsed = now.elapsed();
-        println!("Collected a total mass of {} solar masses.", total_mass);
-
-        println!("Accessing {} data points took {:?}", N, elapsed);
-    }
 }

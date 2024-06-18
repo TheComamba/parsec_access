@@ -3,10 +3,8 @@
 use simple_si_units::base::{Mass, Time};
 
 use crate::{
-    access::{
-        data::ParsecData,
-        metallicity::{METALLICITIES_IN_DEX, METALLICITIES_IN_MASS_FRACTION},
-    },
+    access::metallicity::{METALLICITIES_IN_DEX, METALLICITIES_IN_MASS_FRACTION},
+    data::ParsecData,
     line::ParsecLine,
     trajectory::Trajectory,
 };

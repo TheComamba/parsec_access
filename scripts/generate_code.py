@@ -18,9 +18,9 @@ MOD_TEMPLATE = """
 
 pub(crate) const PARSEC_URL: &str = "{URL}";
 
-pub mod data;
-pub mod metallicity;
-pub mod masses;
+pub(crate) mod data;
+pub(crate) mod metallicity;
+pub(crate) mod masses;
 """
 
 DATA_TEMPLATE = """
@@ -29,12 +29,8 @@ DATA_TEMPLATE = """
 //! Provides access to the data files for the PARSEC stellar evolution models.
 
 use lazy_static::lazy_static;
-use serde::{{Deserialize, Serialize}};
-use std::ops::Index;
 
-use crate::{{error::ParsecAccessError, trajectory::Trajectory}};
-
-use super::metallicity::Metallicity;
+use crate::{{data::ParsecData, error::ParsecAccessError}};
 
 lazy_static! {{
     {static_data}
@@ -44,73 +40,6 @@ lazy_static! {{
     static ref DATA: [&'static Result<ParsecData, ParsecAccessError>; {array_size}] = [
         {access_array}
     ];
-}}
-
-#[derive(Deserialize, Serialize)]
-pub(crate) struct ParsecData {{
-    pub metallicity: Metallicity,
-    pub(crate) data: Vec<Trajectory>,
-}}
-
-impl ParsecData {{
-    pub(crate) fn is_filled(&self) -> bool {{
-        let mut is_filled = !self.data.is_empty();
-        for trajectory in self.data.iter() {{
-            is_filled = is_filled && !trajectory.is_empty();
-        }}
-        is_filled
-    }}
-}}
-
-impl Index<usize> for ParsecData {{
-    type Output = Trajectory;
-
-    fn index(&self, index: usize) -> &Self::Output {{
-        &self.data[index]
-    }}
-}}
-
-#[cfg(test)]
-mod tests {{
-    use simple_si_units::base::Mass;
-
-    use super::*;
-
-    #[test]
-    #[ignore]
-    fn data_access_is_fast() {{
-        const N: usize = 1e6 as usize;
-        const PRIME1: usize = 1009;
-        const PRIME2: usize = 1013;
-        const PRIME3: usize = 10007;
-        const MAX_METALLICITY_INDEX: usize = 10;
-        const MAX_MASS_INDEX: usize = 50;
-        const MAX_TRAJECTORY_INDEX: usize = 100;
-
-        // Ensure that the data is loaded into memory.
-        let _ = DATA[1].as_ref().unwrap()[1][1];
-
-        // Create pseudo-random indices.
-        let mut indices = Vec::new();
-        for i in 0..N {{
-            let metallicity_index = (i * PRIME1) % MAX_METALLICITY_INDEX;
-            let mass_index = (i * PRIME2) % MAX_MASS_INDEX;
-            let trajectory_index = (i * PRIME3) % MAX_TRAJECTORY_INDEX;
-            indices.push((metallicity_index, mass_index, trajectory_index));
-        }}
-
-        // Access the data in a pseudo-random order.
-        let now = std::time::Instant::now();
-        let mut total_mass = Mass {{ kg: 0. }};
-        for (metallicity_index, mass_index, trajectory_index) in indices {{
-            let m = DATA[metallicity_index].as_ref().unwrap()[mass_index][trajectory_index].mass;
-            total_mass += m;
-        }}
-        let elapsed = now.elapsed();
-        println!("Collected a total mass of {{}} solar masses.", total_mass);
-
-        println!("Accessing {{}} data points took {{:?}}", N, elapsed);
-    }}
 }}
 """
 
@@ -264,11 +193,11 @@ def generate_mod_file():
 def generate_data_file(metallicities):
     static_data = ""
     access_array = ""
-    for metallicity in metallicities:
+    for index, metallicity in enumerate(metallicities):
         variant_name = metallicity_variant_name(metallicity)
         static_data += f"static {variant_name}_DATA:"
         static_data += "Result<ParsecData, ParsecAccessError> = "
-        static_data += f"ParsecData::new(Metallicity::{variant_name});\n"
+        static_data += f"ParsecData::new({index});\n"
         access_array += f"&{variant_name}_DATA,\n"
 
     with open(TARGET_DIR + "data.rs", 'w') as f:

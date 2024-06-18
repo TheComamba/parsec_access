@@ -7,28 +7,18 @@ use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::path::PathBuf;
 use tar::Archive;
 
-use crate::access::data::ParsecData;
 use crate::access::masses::get_filenames;
-use crate::access::metallicity::{METALLICITY_ARCHIVES, METALLICITY_NAMES};
+use crate::access::metallicity::{
+    METALLICITIES_IN_MASS_FRACTION, METALLICITY_ARCHIVES, METALLICITY_NAMES,
+};
 use crate::access::PARSEC_URL;
+use crate::data::ParsecData;
 use crate::error::ParsecAccessError;
 use crate::line::ParsecLine;
 use crate::trajectory::Trajectory;
 use crate::{PACKAGE_NAME, PACKAGE_VERSION};
 
-impl ParsecData {
-    pub(crate) fn new(metallicity_index: usize) -> Result<ParsecData, ParsecAccessError> {
-        let data_dir = get_data_dir()?;
-        let metallicity_name = METALLICITY_NAMES[metallicity_index].to_string();
-        let file_path = data_dir.join(metallicity_name + ".rmp");
-
-        if file_path.exists() {
-            read_existing_parsec_file(file_path)
-        } else {
-            create_parsec_data_file(metallicity_index, &data_dir, file_path)
-        }
-    }
-}
+impl ParsecData {}
 
 fn download(metallicity_index: usize) -> Result<(), ParsecAccessError> {
     let data_dir = get_data_dir()?;
@@ -85,7 +75,7 @@ fn delete_data_files(metallicity_index: usize) -> Result<(), ParsecAccessError> 
     Ok(())
 }
 
-fn create_parsec_data_file(
+pub(crate) fn create_parsec_data_file(
     metallicity_index: usize,
     data_dir: &PathBuf,
     file_path: PathBuf,
@@ -125,7 +115,7 @@ fn read_parsec_data_from_files(
     let folder_path = data_dir.join(PathBuf::from(data_dir_name));
     let filepaths = get_filenames(metallicity_index);
     let mut parsec_data = ParsecData {
-        metallicity_index,
+        metallicity_in_mass_fraction: METALLICITIES_IN_MASS_FRACTION[metallicity_index],
         data: Vec::new(),
     };
     for mass_index in 0..filepaths.len() {
@@ -135,7 +125,9 @@ fn read_parsec_data_from_files(
     Ok(parsec_data)
 }
 
-fn read_existing_parsec_file(file_path: PathBuf) -> Result<ParsecData, ParsecAccessError> {
+pub(crate) fn read_existing_parsec_file(
+    file_path: PathBuf,
+) -> Result<ParsecData, ParsecAccessError> {
     println!("Reading PARSEC data from {}", file_path.display());
     let file = File::open(file_path).map_err(ParsecAccessError::Io)?;
     let parsec_data: ParsecData =
@@ -154,7 +146,7 @@ fn is_header(line: &String) -> bool {
         .any(|c| c.is_alphabetic() && c != 'E' && c != 'e')
 }
 
-fn get_data_dir() -> Result<PathBuf, ParsecAccessError> {
+pub(crate) fn get_data_dir() -> Result<PathBuf, ParsecAccessError> {
     let error = ParsecAccessError::Io(std::io::Error::new(
         std::io::ErrorKind::Other,
         "Could not get project dirs",
