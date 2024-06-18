@@ -179,26 +179,6 @@ impl Metallicity {{
         }}
     }}
 
-    /// Finds the closest metallicity enum variant to the given mass fraction Z.
-    ///
-    /// The midpoint between two metallicities is calculated as the arithmetic mean of the two mass fractions.
-    /// Note that this means that there are cases where find_closest_from_fe_dex can lead to a different result.
-    ///
-    /// # Example
-    /// ```
-    /// use parsec_access::access::metallicity::Metallicity;
-    ///
-    /// let closest = Metallicity::find_closest_from_mass_fraction(0.0101);
-    /// assert_eq!(closest, Metallicity::Z0_0100);
-    /// let closest = Metallicity::find_closest_from_mass_fraction(0.);
-    /// assert_eq!(closest, Metallicity::Z0_0001);
-    /// let closest = Metallicity::find_closest_from_mass_fraction(0.999);
-    /// assert_eq!(closest, Metallicity::Z0_0600);
-    /// ```
-    pub fn find_closest_from_mass_fraction(mass_fraction: f32) -> Metallicity {{
-        {find_closest_mass_fraction}
-    }}
-
     /// Converts the metallicity to units of dex for the element iron, using several assumptions.
     ///
     /// PARSEC lists metallicity as
@@ -230,26 +210,6 @@ impl Metallicity {{
         match self {{
             {metallicity_to_dex}
         }}
-    }}
-
-    /// Finds the closest metallicity enum variant to the given dex for the element iron.
-    ///
-    /// The midpoint between two metallicities is calculated as the arithmetic mean of the two dex values.
-    /// Note that this means that there are cases where find_closest_from_mass_fraction can lead to a different result.
-    ///
-    /// # Example
-    /// ```
-    /// use parsec_access::access::metallicity::Metallicity;
-    ///
-    /// let closest = Metallicity::find_closest_from_fe_dex(0.);
-    /// assert_eq!(closest, Metallicity::Z0_0140, "The sun should have a metallicity of roughlty Z = 0.0122. The test found {{}}", closest.to_mass_fraction());
-    /// let closest = Metallicity::find_closest_from_fe_dex(-10.);
-    /// assert_eq!(closest, Metallicity::Z0_0001, "The lowest metallicity should be Z = 0.0001. The test found {{}}", closest.to_mass_fraction());
-    /// let closest = Metallicity::find_closest_from_fe_dex(10.);
-    /// assert_eq!(closest, Metallicity::Z0_0600, "The highest metallicity should be Z = 0.06. The test found {{}}", closest.to_mass_fraction());
-    /// ```
-    pub fn find_closest_from_fe_dex(fe_dex: f32) -> Metallicity {{
-        {find_closest_dex}
     }}
 }}
 
@@ -400,22 +360,6 @@ def mass_fraction_to_dex(mass_fraction):
     Z_sun = 0.0122
     return math.log10(mass_fraction / Z_sun)
 
-def generate_find_closest_function(input_variable_name, variant_and_value_pairs):
-    intermediate_values = []
-    for i in range(len(variant_and_value_pairs) - 1):
-        _variant, value = variant_and_value_pairs[i]
-        _next_variant, next_value = variant_and_value_pairs[i + 1]
-        intermediate_values.append((value + next_value) / 2)
-    function_str = ""
-    for i in range(len(variant_and_value_pairs)):
-        variant, _value = variant_and_value_pairs[i]
-        if i < len(variant_and_value_pairs) - 1:
-            intermediate = intermediate_values[i]
-            function_str += f"if {input_variable_name} < {intermediate} {{ return {variant}; }}\n"
-        else:
-            function_str += f"return {variant};\n"
-    return function_str
-
 def metallicity_variant_name(metallicity):
     return "Z" + metallicity.replace(".", "_")
 
@@ -426,25 +370,19 @@ def generate_metallicity_file(metallicities, metallicity_to_archive_name):
     to_archive_str = ""
     to_mass_fraction_str = ""
     to_dex_str = ""
-    metallicity_and_mass_fraction = []
-    metallicity_and_dex = []
     for metallicity in metallicities:
         enum_comment = "/// Metallic mass fraction Z = " + metallicity
         variant_name = metallicity_variant_name(metallicity)
         array_str += f"Metallicity::{variant_name},\n"
         archive_name = metallicity_to_archive_name[metallicity]
         mass_fraction = float(metallicity)
-        metallicity_and_mass_fraction.append((f"Metallicity::{variant_name}", mass_fraction))
         dex = mass_fraction_to_dex(mass_fraction)
-        metallicity_and_dex.append((f"Metallicity::{variant_name}", dex))
 
         enum_str += f"{enum_comment}\n{variant_name},\n"
         display_impl += f"Metallicity::{variant_name} => write!(f, \"{variant_name}\"),\n"
         to_archive_str += f"Metallicity::{variant_name} => \"{archive_name}\",\n"
         to_mass_fraction_str += f"Metallicity::{variant_name} => {mass_fraction},\n"
         to_dex_str += f"Metallicity::{variant_name} => {dex},\n"
-    find_closest_mass_fraction = generate_find_closest_function("mass_fraction", metallicity_and_mass_fraction)
-    find_closest_dex = generate_find_closest_function("fe_dex", metallicity_and_dex)
 
     with open(TARGET_DIR + "metallicity.rs", 'w') as f:
         f.write(METALLICITY_TEMPLATE.format(metallicities=enum_str,
@@ -453,9 +391,7 @@ def generate_metallicity_file(metallicities, metallicity_to_archive_name):
                                             metallicities_array=array_str,
                                             metallicity_to_archive_name=to_archive_str,
                                             metallicity_to_mass_fraction=to_mass_fraction_str,
-                                            find_closest_mass_fraction=find_closest_mass_fraction,
-                                            metallicity_to_dex=to_dex_str,
-                                            find_closest_dex=find_closest_dex))
+                                            metallicity_to_dex=to_dex_str))
 
 def generate_masses_constant(metallicity, masses):
     masses_str = f"const {metallicity_variant_name(metallicity)}_SORTED_MASSES: [f64; {len(masses)}] = ["

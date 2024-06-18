@@ -65,19 +65,71 @@ pub fn getClosestParameters(
     todo!()
 }
 
-pub(super) fn get_closest_index(list: &[f64], mass: f64) -> usize {
+/// Finds the closest metallicity enum variant to the given mass fraction Z.
+///
+/// The midpoint between two metallicities is calculated as the arithmetic mean of the two mass fractions.
+/// Note that this means that there are cases where find_closest_from_fe_dex can lead to a different result.
+///
+/// # Example
+/// ```
+/// use parsec_access::access::metallicity::Metallicity;
+///
+/// let closest = Metallicity::find_closest_from_mass_fraction(0.0101);
+/// assert_eq!(closest, Metallicity::Z0_0100);
+/// let closest = Metallicity::find_closest_from_mass_fraction(0.);
+/// assert_eq!(closest, Metallicity::Z0_0001);
+/// let closest = Metallicity::find_closest_from_mass_fraction(0.999);
+/// assert_eq!(closest, Metallicity::Z0_0600);
+/// ```
+pub fn get_closest_metallicity_from_mass_fraction(mass_fraction: f32) -> Metallicity {
+    todo!()
+}
+
+/// Finds the closest metallicity enum variant to the given dex for the element iron.
+///
+/// The midpoint between two metallicities is calculated as the arithmetic mean of the two dex values.
+/// Note that this means that there are cases where find_closest_from_mass_fraction can lead to a different result.
+///
+/// # Example
+/// ```
+/// use parsec_access::access::metallicity::Metallicity;
+///
+/// let closest = Metallicity::find_closest_from_fe_dex(0.);
+/// assert_eq!(closest, Metallicity::Z0_0140, "The sun should have a metallicity of roughlty Z = 0.0122. The test found {{}}", closest.to_mass_fraction());
+/// let closest = Metallicity::find_closest_from_fe_dex(-10.);
+/// assert_eq!(closest, Metallicity::Z0_0001, "The lowest metallicity should be Z = 0.0001. The test found {{}}", closest.to_mass_fraction());
+/// let closest = Metallicity::find_closest_from_fe_dex(10.);
+/// assert_eq!(closest, Metallicity::Z0_0600, "The highest metallicity should be Z = 0.06. The test found {{}}", closest.to_mass_fraction());
+/// ```
+pub fn get_closest_metallicity_from_fe_dex(fe_dex: f32) -> Metallicity {
+    todo!()
+}
+
+pub fn get_closest_mass_index(metallicity: &Metallicity, mass: Mass<f64>) -> usize {
+    todo!()
+}
+
+pub fn get_closest_age_index(
+    metallicity: &Metallicity,
+    mass_index: usize,
+    age: Time<f64>,
+) -> usize {
+    todo!()
+}
+
+pub(super) fn get_closest_index(list: &[f64], value: f64) -> usize {
     let mut min_index = 0;
     let mut max_index = list.len() - 1;
     while max_index - min_index > 1 {
         let mid_index = (max_index + min_index) / 2;
         let mid_mass = list[mid_index];
-        if mass > mid_mass {
+        if value > mid_mass {
             min_index = mid_index;
         } else {
             max_index = mid_index;
         }
     }
-    if (mass - list[min_index]).abs() < (mass - list[max_index]).abs() {
+    if (value - list[min_index]).abs() < (value - list[max_index]).abs() {
         min_index
     } else {
         max_index
