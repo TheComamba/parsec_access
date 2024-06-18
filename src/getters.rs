@@ -167,7 +167,7 @@ pub fn get_masses_in_solar(metallicity_index: usize) -> &'static [f64] {
 }
 
 pub fn get_closest_mass_index(metallicity_index: usize, mass: Mass<f64>) -> usize {
-    todo!()
+    get_closest_index(&MASSES[metallicity_index], mass.to_solar_mass())
 }
 
 pub fn get_ages_in_years(metallicity_index: usize, mass_index: usize) -> &'static [f64] {

@@ -9,6 +9,7 @@ pub struct Trajectory {
     params: Vec<ParsecLine>,
     pub initial_mass: Mass<f64>,
     pub lifetime: Time<f64>,
+    pub ages_in_years: Vec<f64>,
 }
 
 impl Index<usize> for Trajectory {
@@ -26,11 +27,13 @@ impl Trajectory {
             Some(last) => last.age,
             None => Time { s: 0. },
         };
+        let ages_in_years = params.iter().map(|line| line.age.to_yr()).collect();
 
         Self {
             params,
             initial_mass,
             lifetime,
+            ages_in_years
         }
     }
 
