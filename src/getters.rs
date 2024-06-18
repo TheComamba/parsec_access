@@ -18,7 +18,7 @@ use crate::{
 ///
 /// # Example
 /// ```
-/// use parsec::getters::is_data_ready;
+/// use parsec_access::getters::is_data_ready;
 ///
 /// assert!(is_data_ready());
 /// ```
@@ -47,7 +47,7 @@ pub fn is_data_ready() -> bool {
 /// assert!(is_data_ready());
 /// let data = get_data(1);
 /// assert!(data.metallicity_in_mass_fraction > 0.);
-/// let first_trajectory = data[0];
+/// let first_trajectory = &data[0];
 /// ```
 pub fn get_data(metallicity_index: usize) -> &'static ParsecData {
     &DATA[metallicity_index]
@@ -91,8 +91,8 @@ pub fn get_closest_data(mass_fraction: f64) -> &'static ParsecData {
 ///
 /// assert!(is_data_ready());
 /// let trajectory = get_trajectory(1, 2);
-/// assert!(trajectory.initial_mass > 0.);
-/// assert!(trajectory.lifetime > 0.);
+/// assert!(trajectory.initial_mass.to_solar_mass() > 0.);
+/// assert!(trajectory.lifetime.to_yr() > 0.);
 /// ```
 pub fn get_trajectory(metallicity_index: usize, mass_index: usize) -> &'static Trajectory {
     &DATA[metallicity_index].data[mass_index]
@@ -110,11 +110,12 @@ pub fn get_trajectory(metallicity_index: usize, mass_index: usize) -> &'static T
 /// # Example
 /// ```
 /// use parsec_access::getters::{get_closest_trajectory, is_data_ready};
+/// use simple_si_units::base::Mass;
 ///
 /// assert!(is_data_ready());
-/// let trajectory = get_closest_trajectory(0.01, 1.);
-/// assert!(trajectory.initial_mass.to_solar_masses() > 0.9);
-/// assert!(trajectory.initial_mass.to_solar_masses() < 1.1);
+/// let trajectory = get_closest_trajectory(0.01, Mass::from_solar_mass(1.));
+/// assert!(trajectory.initial_mass.to_solar_mass() > 0.9);
+/// assert!(trajectory.initial_mass.to_solar_mass() < 1.1);
 /// ```
 pub fn get_closest_trajectory(mass_fraction: f64, mass: Mass<f64>) -> &'static Trajectory {
     let metallicity_index = get_closest_metallicity_index_from_mass_fraction(mass_fraction);
@@ -137,11 +138,11 @@ pub fn get_closest_trajectory(mass_fraction: f64, mass: Mass<f64>) -> &'static T
 ///
 /// assert!(is_data_ready());
 /// let parameters = get_parameters(1, 2, 3);
-/// assert!(parameters.mass.to_solar_masses() > 0.);
+/// assert!(parameters.mass.to_solar_mass() > 0.);
 /// assert!(parameters.age.to_yr() > 0.);
 /// assert!(parameters.luminous_intensity.to_cd() > 0.);
-/// assert!(parameters.temperature.to_kelvin() > 0.);
-/// assert!(parameters.radius.to_solar_radii() > 0.);
+/// assert!(parameters.temperature.to_K() > 0.);
+/// assert!(parameters.radius.to_km() > 0.);
 /// ```
 pub fn get_parameters(
     metallicity_index: usize,
@@ -163,13 +164,15 @@ pub fn get_parameters(
 /// # Example
 /// ```
 /// use parsec_access::getters::{get_closest_parameters, is_data_ready};
+/// use simple_si_units::base::Mass;
+/// use simple_si_units::base::Time;
 ///
 /// assert!(is_data_ready());
-/// let parameters = get_closest_parameters(0.01, Mass::from_solar(1.), Time::from_Gyr(1.));
-/// assert!(parameters.mass.to_solar_masses() > Mass::from_solar(0.9));
-/// assert!(parameters.mass.to_solar_masses() < Mass::from_solar(1.1));
-/// assert!(parameters.age.to_yr() > Time::from_Gyr(0.9));
-/// assert!(parameters.age.to_yr() < Time::from_Gyr(1.1));
+/// let parameters = get_closest_parameters(0.01, Mass::from_solar_mass(1.), Time::from_Gyr(1.));
+/// assert!(parameters.mass > Mass::from_solar_mass(0.9));
+/// assert!(parameters.mass < Mass::from_solar_mass(1.1));
+/// assert!(parameters.age > Time::from_Gyr(0.9));
+/// assert!(parameters.age < Time::from_Gyr(1.1));
 /// ```
 pub fn get_closest_parameters(
     mass_fraction: f64,
@@ -241,16 +244,16 @@ pub fn get_metallicities_in_fe_dex() -> &'static [f64] {
 ///
 /// # Example
 /// ```
-/// use parsec_access::getters::get_closest_metallicity_index_from_mass_fraction;
+/// use parsec_access::getters::{get_closest_metallicity_index_from_mass_fraction, get_metallicities_in_mass_fractions};
 ///
 /// let index = get_closest_metallicity_index_from_mass_fraction(0.0101);
-/// let expected = get_metallicites_in_mass_fractions()[index];
+/// let expected = get_metallicities_in_mass_fractions()[index];
 /// assert!((expected-0.01).abs() < 1e-8);
 /// let index = get_closest_metallicity_index_from_mass_fraction(0.);
 /// let expected = 0;
 /// assert_eq!(index, expected);
 /// let index = get_closest_metallicity_index_from_mass_fraction(0.999);
-/// let expected = get_metallicites_in_mass_fractions().len() - 1;
+/// let expected = get_metallicities_in_mass_fractions().len() - 1;
 /// assert_eq!(index, expected);
 /// ```
 pub fn get_closest_metallicity_index_from_mass_fraction(mass_fraction: f64) -> usize {
@@ -266,15 +269,15 @@ pub fn get_closest_metallicity_index_from_mass_fraction(mass_fraction: f64) -> u
 ///
 /// # Example
 /// ```
-/// use parsec_access::getters::get_closest_metallicity_index_from_fe_dex;
+/// use parsec_access::getters::{get_closest_metallicity_index_from_fe_dex, get_metallicities_in_fe_dex};
 ///
 /// let index = get_closest_metallicity_index_from_fe_dex(0.);
-/// println!("{} dex is the closest metallicity to 0 dex", get_metallicities_in_fe_dex()[index]);:
+/// println!("{} dex is the closest metallicity to 0 dex", get_metallicities_in_fe_dex()[index]);
 /// let index = get_closest_metallicity_index_from_fe_dex(-10.);
 /// let expected = 0;
 /// assert_eq!(index, expected);
 /// let index = get_closest_metallicity_index_from_fe_dex(10.);
-/// let expected = get_metallicites_in_mass_fractions().len() - 1;
+/// let expected = get_metallicities_in_fe_dex().len() - 1;
 /// assert_eq!(index, expected);
 /// ```
 pub fn get_closest_metallicity_index_from_fe_dex(fe_dex: f64) -> usize {
@@ -289,7 +292,7 @@ pub fn get_closest_metallicity_index_from_fe_dex(fe_dex: f64) -> usize {
 ///
 /// assert!(get_masses_in_solar(0).len() > 0);
 ///
-/// for mass in get_masses_in_solar(0).take(10) {
+/// for mass in get_masses_in_solar(0) {
 ///    println!("Mass in solar masses: {}", mass);
 /// }
 /// ```
@@ -303,15 +306,16 @@ pub fn get_masses_in_solar(metallicity_index: usize) -> &'static [f64] {
 ///
 /// # Example
 /// ```
-/// use parsec_access::getters::get_closest_mass_index;
+/// use parsec_access::getters::{get_closest_mass_index, get_masses_in_solar};
+/// use simple_si_units::base::Mass;
 ///
-/// let index = get_closest_mass_index(0, Mass::from_solar(1.));
+/// let index = get_closest_mass_index(0, Mass::from_solar_mass(1.));
 /// let expected = get_masses_in_solar(0)[index];
 /// assert!((expected-1.).abs() < 1e-8);
-/// let index = get_closest_mass_index(0, Mass::from_solar(0.));
+/// let index = get_closest_mass_index(0, Mass::from_solar_mass(0.));
 /// let expected = 0;
 /// assert_eq!(index, expected);
-/// let index = get_closest_mass_index(0, Mass::from_solar(1000.));
+/// let index = get_closest_mass_index(0, Mass::from_solar_mass(1000.));
 /// let expected = get_masses_in_solar(0).len() - 1;
 /// assert_eq!(index, expected);
 /// ```
@@ -334,8 +338,13 @@ pub fn get_closest_mass_index(metallicity_index: usize, mass: Mass<f64>) -> usiz
 ///
 /// assert!(get_ages_in_years(0, 0).len() > 0);
 ///
-/// for age in get_ages_in_years(0, 0).take(10) {
+/// let mut count = 0;
+/// for age in get_ages_in_years(0, 0) {
 ///   println!("Age in years: {}", age);
+///   count += 1;
+///   if count > 10 {
+///     break;
+///   }
 /// }
 /// ```
 pub fn get_ages_in_years(metallicity_index: usize, mass_index: usize) -> &'static [f64] {
@@ -353,13 +362,14 @@ pub fn get_ages_in_years(metallicity_index: usize, mass_index: usize) -> &'stati
 ///
 /// # Example
 /// ```
-/// use parsec_access::getters::{get_closest_age_index, is_data_ready};
+/// use parsec_access::getters::{get_ages_in_years, get_closest_age_index, is_data_ready};
+/// use simple_si_units::base::Time;
 ///
 /// assert!(is_data_ready());
 ///
 /// let index = get_closest_age_index(0, 0, Time::from_Gyr(1.));
 /// let expected = get_ages_in_years(0, 0)[index];
-/// assert!((expected-1.).abs() < 1e-8);
+/// assert!((Time::from_yr(expected)-Time::from_Gyr(1.)).to_Gyr().abs() < 1e-1);
 /// let index = get_closest_age_index(0, 0, Time::from_yr(0.));
 /// let expected = 0;
 /// assert_eq!(index, expected);
