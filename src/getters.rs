@@ -3,17 +3,18 @@
 use simple_si_units::base::{Mass, Time};
 
 use crate::{
-    access::metallicity::{METALLICITIES_IN_DEX, METALLICITIES_IN_MASS_FRACTION},
+    access::{masses::MASSES, metallicity::{METALLICITIES_IN_DEX, METALLICITIES_IN_MASS_FRACTION}},
     data::ParsecData,
     line::ParsecLine,
     trajectory::Trajectory,
 };
+
 /// Loads the Parsec data and makes sure that it is valid.
 /// This step can and should be used once before accessing the data, because the getter functions do not perform any checks due to performance reasons.
 ///
 /// # Example
 /// ```
-/// use parsec::getters::is_data_ready();
+/// use parsec::getters::is_data_ready;
 ///
 /// assert!(is_data_ready());
 /// ```
@@ -30,7 +31,7 @@ pub fn is_data_ready() -> bool {
 /// Call is_data_ready() once before using this function to ensure that the data is loaded and valid.
 ///
 // Todo Example
-pub fn getData(metallicity_index: usize) -> &'static ParsecData {
+pub fn get_data(metallicity_index: usize) -> &'static ParsecData {
     todo!()
 }
 
@@ -38,19 +39,19 @@ pub fn getData(metallicity_index: usize) -> &'static ParsecData {
 /// The untyped input value is expected to be a mass fraction of all metals to total mass.
 /// This is a convenience wrapper around the much faster getData().
 // Todo Example
-pub fn getClosestData(mass_fraction: f64) -> &'static ParsecData {
+pub fn get_closest_data(mass_fraction: f64) -> &'static ParsecData {
     todo!()
 }
 
-pub fn getTrajectory(metallicity_index: usize, mass_index: usize) -> &'static Trajectory {
+pub fn get_trajectory(metallicity_index: usize, mass_index: usize) -> &'static Trajectory {
     todo!()
 }
 
-pub fn getClosestTrajectory(mass_fraction: f64, mass: Mass<f64>) -> &'static Trajectory {
+pub fn get_closest_trajectory(mass_fraction: f64, mass: Mass<f64>) -> &'static Trajectory {
     todo!()
 }
 
-pub fn getParameters(
+pub fn get_parameters(
     metallicity_index: usize,
     mass_index: usize,
     age_index: usize,
@@ -58,7 +59,7 @@ pub fn getParameters(
     todo!()
 }
 
-pub fn getClosestParameters(
+pub fn get_closest_parameters(
     mass_fraction: f64,
     mass: Mass<f64>,
     age: Time<f64>,
@@ -161,7 +162,15 @@ pub fn get_closest_metallicity_index_from_fe_dex(fe_dex: f64) -> usize {
     get_closest_index(&METALLICITIES_IN_DEX, fe_dex)
 }
 
+pub fn get_masses_in_solar(metallicity_index: usize) -> &'static [f64] {
+    &MASSES[metallicity_index]
+}
+
 pub fn get_closest_mass_index(metallicity_index: usize, mass: Mass<f64>) -> usize {
+    todo!()
+}
+
+pub fn get_ages_in_years(metallicity_index: usize, mass_index: usize) -> &'static [f64] {
     todo!()
 }
 

@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[derive(Deserialize, Serialize)]
-pub(crate) struct ParsecData {
+pub struct ParsecData {
     pub metallicity_in_mass_fraction: f64,
     pub(crate) data: Vec<Trajectory>,
 }
