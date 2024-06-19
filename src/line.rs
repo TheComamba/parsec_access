@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
-use simple_si_units::base::Distance;
+use simple_si_units::base::{Distance, Luminosity, Mass, Temperature, Time};
 
 use crate::error::ParsecAccessError;
 
-pub(super) struct ParsecLine {
+pub(super) struct RawParsecLine {
     mass: f64,
     age: f64,
     log_l: f64,
@@ -12,15 +12,15 @@ pub(super) struct ParsecLine {
 }
 
 #[derive(Deserialize, Serialize, Clone)]
-pub(crate) struct ParsedParsecLine {
-    pub(super) mass_in_solar_masses: f64,
-    pub(super) age_in_years: f64,
-    pub(super) luminous_intensity_in_solar: f64,
-    pub(super) temperature_in_kelvin: f64,
-    pub(super) radius_in_solar_radii: f64,
+pub struct ParsecLine {
+    pub mass: Mass<f64>,
+    pub age: Time<f64>,
+    pub luminous_intensity: Luminosity<f64>,
+    pub temperature: Temperature<f64>,
+    pub radius: Distance<f64>,
 }
 
-impl ParsedParsecLine {
+impl ParsecLine {
     const MASS_INDEX: usize = 1;
     const AGE_INDEX: usize = 2;
     const LOG_L_INDEX: usize = 3;
@@ -52,7 +52,7 @@ impl ParsedParsecLine {
             log_te_entry.parse::<f64>(),
             log_r_entry.parse::<f64>(),
         ) {
-            let parsec_line = ParsecLine {
+            let parsec_line = RawParsecLine {
                 mass,
                 age,
                 log_l,
@@ -70,16 +70,16 @@ impl ParsedParsecLine {
     }
 }
 
-impl ParsecLine {
-    fn parse(self) -> ParsedParsecLine {
-        let radius = Distance::from_cm(10f64.powf(self.log_r));
-        const SOLAR_RADIUS: Distance<f64> = Distance { m: 6.957e8 };
-        ParsedParsecLine {
-            mass_in_solar_masses: self.mass,
-            age_in_years: self.age,
-            luminous_intensity_in_solar: 10f64.powf(self.log_l),
-            temperature_in_kelvin: 10f64.powf(self.log_te),
-            radius_in_solar_radii: radius / SOLAR_RADIUS,
+impl RawParsecLine {
+    fn parse(self) -> ParsecLine {
+        pub const SOLAR_LUMINOUS_INTENSITY: Luminosity<f64> = Luminosity { cd: 2.98e27 };
+
+        ParsecLine {
+            mass: Mass::from_solar_mass(self.mass),
+            age: Time::from_yr(self.age),
+            luminous_intensity: 10f64.powf(self.log_l) * SOLAR_LUMINOUS_INTENSITY,
+            temperature: Temperature::from_K(10f64.powf(self.log_te)),
+            radius: Distance::from_cm(10f64.powf(self.log_r)),
         }
     }
 }
