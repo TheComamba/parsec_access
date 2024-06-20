@@ -3,7 +3,7 @@ use std::ops::Index;
 
 use crate::{
     access::metallicity::METALLICITY_NAMES,
-    file::{create_parsec_data_file, get_data_dir, read_existing_parsec_file},
+    file::{create_serialised_parsec_data_file, get_data_dir, read_serialised_parsec_file},
     trajectory::Trajectory,
 };
 
@@ -26,9 +26,9 @@ impl ParsecData {
         let file_path = data_dir.join(metallicity_name + ".rmp");
 
         let result = if file_path.exists() {
-            read_existing_parsec_file(file_path)
+            read_serialised_parsec_file(file_path)
         } else {
-            create_parsec_data_file(metallicity_index, &data_dir, file_path)
+            create_serialised_parsec_data_file(metallicity_index, &data_dir, file_path)
         };
         match result {
             Ok(data) => data,

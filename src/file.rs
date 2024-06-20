@@ -55,7 +55,7 @@ fn read_trajectory_file(file_path: PathBuf) -> Result<Trajectory, ParsecAccessEr
     Ok(Trajectory::new(lines))
 }
 
-fn ensure_data_files(metallicity_index: usize) -> Result<(), ParsecAccessError> {
+fn ensure_raw_data_files(metallicity_index: usize) -> Result<(), ParsecAccessError> {
     let data_dir = get_data_dir()?;
     let dirname = METALLICITY_ARCHIVES[metallicity_index].replace(".tar.gz", "");
     let path = data_dir.join(PathBuf::from(dirname));
@@ -65,7 +65,7 @@ fn ensure_data_files(metallicity_index: usize) -> Result<(), ParsecAccessError> 
     Ok(())
 }
 
-fn delete_data_files(metallicity_index: usize) -> Result<(), ParsecAccessError> {
+fn delete_raw_data_files(metallicity_index: usize) -> Result<(), ParsecAccessError> {
     let data_dir = get_data_dir()?;
     let dirname = METALLICITY_ARCHIVES[metallicity_index].replace(".tar.gz", "");
     let path = data_dir.join(PathBuf::from(dirname));
@@ -75,14 +75,14 @@ fn delete_data_files(metallicity_index: usize) -> Result<(), ParsecAccessError> 
     Ok(())
 }
 
-pub(crate) fn create_parsec_data_file(
+pub(crate) fn create_serialised_parsec_data_file(
     metallicity_index: usize,
     data_dir: &PathBuf,
     file_path: PathBuf,
 ) -> Result<ParsecData, ParsecAccessError> {
-    let parsec_data = read_parsec_data_from_files(metallicity_index, data_dir)?;
+    let parsec_data = read_raw_parsec_data_from_files(metallicity_index, data_dir)?;
     save_parsec_data_to_file(file_path, &parsec_data)?;
-    delete_data_files(metallicity_index)?;
+    delete_raw_data_files(metallicity_index)?;
     if parsec_data.is_valid() {
         Ok(parsec_data)
     } else {
@@ -106,11 +106,11 @@ fn save_parsec_data_to_file(
     Ok(())
 }
 
-fn read_parsec_data_from_files(
+fn read_raw_parsec_data_from_files(
     metallicity_index: usize,
     data_dir: &PathBuf,
 ) -> Result<ParsecData, ParsecAccessError> {
-    ensure_data_files(metallicity_index)?;
+    ensure_raw_data_files(metallicity_index)?;
     let data_dir_name = METALLICITY_ARCHIVES[metallicity_index].replace(".tar.gz", "");
     let folder_path = data_dir.join(PathBuf::from(data_dir_name));
     let filepaths = FILENAMES[metallicity_index];
@@ -125,7 +125,7 @@ fn read_parsec_data_from_files(
     Ok(parsec_data)
 }
 
-pub(crate) fn read_existing_parsec_file(
+pub(crate) fn read_serialised_parsec_file(
     file_path: PathBuf,
 ) -> Result<ParsecData, ParsecAccessError> {
     println!("Reading PARSEC data from {}", file_path.display());
