@@ -71,7 +71,7 @@ impl ParsecLine {
 
 impl RawParsecLine {
     fn parse(self) -> ParsecLine {
-        pub const SOLAR_LUMINOUS_INTENSITY: Luminosity<f64> = Luminosity { cd: 2.98e27 };
+        const SOLAR_LUMINOUS_INTENSITY: Luminosity<f64> = Luminosity { cd: 2.98e27 };
 
         ParsecLine {
             mass: Mass::from_solar_mass(self.mass),

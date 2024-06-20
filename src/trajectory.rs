@@ -21,7 +21,10 @@ impl Index<usize> for Trajectory {
 
 impl Trajectory {
     pub(super) fn new(params: Vec<ParsecLine>) -> Self {
-        let initial_mass = params[0].mass;
+        let initial_mass = match params.first() {
+            Some(params) => params.mass,
+            None => Mass { kg: 0. },
+        };
         let lifetime = match params.last() {
             Some(last) => last.age,
             None => Time { s: 0. },
@@ -38,5 +41,16 @@ impl Trajectory {
 
     pub(super) fn is_empty(&self) -> bool {
         self.params.is_empty()
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::Trajectory;
+
+    #[test]
+    fn constructor_with_empty_params_does_not_throw() {
+        let trajectory = Trajectory::new(vec![]);
+        assert!(trajectory.is_empty());
     }
 }

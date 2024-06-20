@@ -64,44 +64,39 @@ impl Index<usize> for ParsecData {
 }
 
 #[cfg(test)]
-mod tests {
-    use simple_si_units::base::Mass;
+mod test {
+    use simple_si_units::base::{Distance, Luminosity, Mass, Temperature, Time};
+
+    use crate::line::ParsecLine;
 
     use super::*;
 
     #[test]
-    #[ignore]
-    fn data_access_is_fast() {
-        // const N: usize = 1e6 as usize;
-        // const PRIME1: usize = 1009;
-        // const PRIME2: usize = 1013;
-        // const PRIME3: usize = 10007;
-        // const MAX_METALLICITY_INDEX: usize = 10;
-        // const MAX_MASS_INDEX: usize = 50;
-        // const MAX_TRAJECTORY_INDEX: usize = 100;
+    fn default_data_is_invalid() {
+        let data = ParsecData::default();
+        assert!(!data.is_valid());
+    }
 
-        // // Ensure that the data is loaded into memory.
-        // let _ = DATA[1].as_ref().unwrap()[1][1];
+    #[test]
+    fn empty_data_is_invalid() {
+        let mut data = ParsecData::default();
+        data.metallicity_in_mass_fraction = 0.05;
+        assert!(!data.is_valid());
+    }
 
-        // // Create pseudo-random indices.
-        // let mut indices = Vec::new();
-        // for i in 0..N {
-        //     let metallicity_index = (i * PRIME1) % MAX_METALLICITY_INDEX;
-        //     let mass_index = (i * PRIME2) % MAX_MASS_INDEX;
-        //     let trajectory_index = (i * PRIME3) % MAX_TRAJECTORY_INDEX;
-        //     indices.push((metallicity_index, mass_index, trajectory_index));
-        // }
-
-        // // Access the data in a pseudo-random order.
-        // let now = std::time::Instant::now();
-        // let mut total_mass = Mass { kg: 0. };
-        // for (metallicity_index, mass_index, trajectory_index) in indices {
-        //     let m = DATA[metallicity_index].as_ref().unwrap()[mass_index][trajectory_index].mass;
-        //     total_mass += m;
-        // }
-        // let elapsed = now.elapsed();
-        // println!("Collected a total mass of {} solar masses.", total_mass);
-
-        // println!("Accessing {} data points took {:?}", N, elapsed);
+    #[test]
+    fn data_with_empty_trajectory_is_invalid() {
+        let mut data = ParsecData::default();
+        data.metallicity_in_mass_fraction = 0.05;
+        let valid_line = ParsecLine {
+            mass: Mass { kg: 1. },
+            age: Time { s: 1. },
+            luminous_intensity: Luminosity { cd: 1. },
+            temperature: Temperature { K: 1. },
+            radius: Distance { m: 1. },
+        };
+        data.data.push(Trajectory::new(vec![valid_line]));
+        data.data.push(Trajectory::new(vec![]));
+        assert!(!data.is_valid());
     }
 }
