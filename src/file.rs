@@ -93,15 +93,7 @@ pub(crate) fn read_data_files(
     metallicity_index: usize,
     data_dir: &PathBuf,
 ) -> Result<ParsecData, ParsecAccessError> {
-    use std::time::Instant;
-
-    let start = Instant::now();
     let parsec_data = read_parsec_data_from_files(metallicity_index, data_dir)?;
-    let duration = start.elapsed();
-    println!(
-        "Time elapsed in reading and parsing the file is: {:?}",
-        duration
-    );
 
     if parsec_data.is_valid() {
         Ok(parsec_data)

@@ -4,10 +4,11 @@ mod tests {
     use serial_test::serial;
     use simple_si_units::base::{Mass, Time};
 
+    const N: usize = 1e6 as usize;
+
     #[test]
     #[serial]
     fn get_parameters_is_fast() {
-        const N: usize = 1e6 as usize;
         const PRIME1: usize = 1009;
         const PRIME2: usize = 1013;
         const PRIME3: usize = 10007;
@@ -47,7 +48,6 @@ mod tests {
     #[test]
     #[serial]
     fn get_closest_parameters_is_reasonably_fast() {
-        const N: usize = 1e4 as usize;
         const PRIME1: usize = 10037;
         const PRIME2: usize = 10039;
         const PRIME3: usize = 10061;
