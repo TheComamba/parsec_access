@@ -1,10 +1,9 @@
-use serde::{Deserialize, Serialize};
 use simple_si_units::base::{Mass, Time};
 use std::ops::Index;
 
 use super::line::ParsecLine;
 
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Clone)]
 pub struct Trajectory {
     params: Vec<ParsecLine>,
     pub initial_mass: Mass<f64>,

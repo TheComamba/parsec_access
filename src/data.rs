@@ -1,13 +1,10 @@
-use serde::{Deserialize, Serialize};
 use std::ops::Index;
 
 use crate::{
-    access::metallicity::METALLICITY_NAMES,
-    file::{create_parsec_data_file, get_data_dir, read_existing_parsec_file},
+    file::{get_data_dir, read_data_files},
     trajectory::Trajectory,
 };
 
-#[derive(Deserialize, Serialize)]
 pub struct ParsecData {
     pub metallicity_in_mass_fraction: f64,
     pub(crate) data: Vec<Trajectory>,
@@ -22,14 +19,7 @@ impl ParsecData {
                 return ParsecData::default();
             }
         };
-        let metallicity_name = METALLICITY_NAMES[metallicity_index].to_string();
-        let file_path = data_dir.join(metallicity_name + ".rmp");
-
-        let result = if file_path.exists() {
-            read_existing_parsec_file(file_path)
-        } else {
-            create_parsec_data_file(metallicity_index, &data_dir, file_path)
-        };
+        let result = read_data_files(metallicity_index, &data_dir);
         match result {
             Ok(data) => data,
             Err(err) => {
