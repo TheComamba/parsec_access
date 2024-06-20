@@ -10,7 +10,9 @@ pub enum ParsecAccessError {
     /// The requested data is not available.
     DataNotAvailable(String),
     /// An error occurred while trying to parse a glob pattern.
-    Glob(glob::PatternError),
+    Glob(glob::GlobError),
+    /// An error occurred while trying to parse a glob pattern.
+    GlobPattern(glob::PatternError),
     /// An I/O error occurred.
     Io(std::io::Error),
 }
@@ -21,6 +23,7 @@ impl fmt::Display for ParsecAccessError {
             ParsecAccessError::Connection(err) => write!(f, "Connection error: {}", err),
             ParsecAccessError::DataNotAvailable(data) => write!(f, "Data {} not available", data),
             ParsecAccessError::Glob(err) => write!(f, "Glob error: {}", err),
+            ParsecAccessError::GlobPattern(err) => write!(f, "Glob pattern error: {}", err),
             ParsecAccessError::Io(err) => write!(f, "I/O error: {}", err),
         }
     }

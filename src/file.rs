@@ -78,16 +78,12 @@ fn clean_up_old_data_dirs() -> Result<(), ParsecAccessError> {
     let parts: Vec<&str> = data_dir_str.split('_').collect();
     let data_dir_glob = parts[..parts.len() - 1].join("_") + "_*";
 
-    let entries = glob(&data_dir_glob).map_err(ParsecAccessError::Glob)?;
+    let entries = glob(&data_dir_glob).map_err(ParsecAccessError::GlobPattern)?;
     for entry in entries {
-        match entry {
-            Ok(path) => {
-                if path != data_dir {
-                    println!("Removing old data directory: {:?}", path);
-                    fs::remove_dir_all(&path).map_err(ParsecAccessError::Io)?;
-                }
-            }
-            Err(e) => println!("{:?}", e),
+        let path = entry.map_err(ParsecAccessError::Glob)?;
+        if path != data_dir {
+            println!("Removing old data directory: {:?}", path);
+            fs::remove_dir_all(&path).map_err(ParsecAccessError::Io)?;
         }
     }
     Ok(())
