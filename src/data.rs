@@ -62,3 +62,41 @@ impl Index<usize> for ParsecData {
         &self.data[index]
     }
 }
+
+#[cfg(test)]
+mod test {
+    use simple_si_units::base::{Distance, Luminosity, Mass, Temperature, Time};
+
+    use crate::line::ParsecLine;
+
+    use super::*;
+
+    #[test]
+    fn default_data_is_invalid() {
+        let data = ParsecData::default();
+        assert!(!data.is_valid());
+    }
+
+    #[test]
+    fn empty_data_is_invalid() {
+        let mut data = ParsecData::default();
+        data.metallicity_in_mass_fraction = 0.05;
+        assert!(!data.is_valid());
+    }
+
+    #[test]
+    fn data_with_empty_trajectory_is_invalid() {
+        let mut data = ParsecData::default();
+        data.metallicity_in_mass_fraction = 0.05;
+        let valid_line = ParsecLine {
+            mass: Mass { kg: 1. },
+            age: Time { s: 1. },
+            luminous_intensity: Luminosity { cd: 1. },
+            temperature: Temperature { K: 1. },
+            radius: Distance { m: 1. },
+        };
+        data.data.push(Trajectory::new(vec![valid_line]));
+        data.data.push(Trajectory::new(vec![]));
+        assert!(!data.is_valid());
+    }
+}
