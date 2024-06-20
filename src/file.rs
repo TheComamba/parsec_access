@@ -15,7 +15,7 @@ use crate::data::ParsecData;
 use crate::error::ParsecAccessError;
 use crate::line::ParsecLine;
 use crate::trajectory::Trajectory;
-use crate::{PACKAGE_NAME, PACKAGE_VERSION};
+use crate::PACKAGE_NAME;
 
 impl ParsecData {}
 
@@ -124,7 +124,6 @@ pub(crate) fn get_data_dir() -> Result<PathBuf, ParsecAccessError> {
         std::io::ErrorKind::Other,
         "Could not get project dirs",
     ));
-    let app = format!("{}_{}", PACKAGE_NAME, PACKAGE_VERSION);
-    let project_dirs = ProjectDirs::from("", "the_comamba", &app).ok_or(error)?;
+    let project_dirs = ProjectDirs::from("", "the_comamba", &PACKAGE_NAME).ok_or(error)?;
     Ok(project_dirs.data_dir().into())
 }
