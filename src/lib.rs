@@ -10,3 +10,4 @@ pub mod line;
 pub mod trajectory;
 
 pub(crate) const PACKAGE_NAME: &'static str = env!("CARGO_PKG_NAME");
+pub(crate) const PACKAGE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
