@@ -129,9 +129,18 @@ pub(crate) fn read_serialised_parsec_file(
     file_path: PathBuf,
 ) -> Result<ParsecData, ParsecAccessError> {
     println!("Reading PARSEC data from {}", file_path.display());
+    use std::time::Instant;
+
+    let start = Instant::now();
     let file = File::open(file_path).map_err(ParsecAccessError::Io)?;
-    let parsec_data: ParsecData =
-        rmp_serde::from_read(file).map_err(ParsecAccessError::RmpDeserialization)?;
+    let duration = start.elapsed();
+    println!("Time elapsed in opening the file is: {:?}", duration);
+
+    let start = Instant::now();
+    let parsec_data: ParsecData = rmp_serde::from_read(file).map_err(ParsecAccessError::RmpDeserialization)?;
+    let duration = start.elapsed();
+    println!("Time elapsed in deserialization is: {:?}", duration);
+
     if parsec_data.is_valid() {
         Ok(parsec_data)
     } else {

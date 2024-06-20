@@ -407,6 +407,11 @@ pub(super) fn get_closest_index(list: &[f64], value: f64) -> usize {
 mod tests {
     use super::*;
 
+    #[test]
+    #[ignore]
+    fn data_is_ready() {
+        assert!(is_data_ready());
+    }
     // #[test]
     // fn masses_are_mapped_to_themselves() {
     //     const SMALL_OFFSET: f64 = 1e-4;
