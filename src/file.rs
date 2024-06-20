@@ -1,9 +1,7 @@
 use directories::ProjectDirs;
 use flate2::read::GzDecoder;
-use rmp_serde;
-use std::fs;
 use std::fs::File;
-use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use tar::Archive;
 
@@ -65,24 +63,20 @@ fn ensure_raw_data_files(metallicity_index: usize) -> Result<(), ParsecAccessErr
     Ok(())
 }
 
-fn delete_raw_data_files(metallicity_index: usize) -> Result<(), ParsecAccessError> {
-    let data_dir = get_data_dir()?;
-    let dirname = METALLICITY_ARCHIVES[metallicity_index].replace(".tar.gz", "");
-    let path = data_dir.join(PathBuf::from(dirname));
-    if path.exists() {
-        fs::remove_dir_all(path).map_err(ParsecAccessError::Io)?;
-    }
-    Ok(())
-}
-
-pub(crate) fn create_serialised_parsec_data_file(
+pub(crate) fn read_data_files(
     metallicity_index: usize,
     data_dir: &PathBuf,
-    file_path: PathBuf,
 ) -> Result<ParsecData, ParsecAccessError> {
-    let parsec_data = read_raw_parsec_data_from_files(metallicity_index, data_dir)?;
-    save_parsec_data_to_file(file_path, &parsec_data)?;
-    delete_raw_data_files(metallicity_index)?;
+    use std::time::Instant;
+
+    let start = Instant::now();
+    let parsec_data = read_parsec_data_from_files(metallicity_index, data_dir)?;
+    let duration = start.elapsed();
+    println!(
+        "Time elapsed in reading and parsing the file is: {:?}",
+        duration
+    );
+
     if parsec_data.is_valid() {
         Ok(parsec_data)
     } else {
@@ -94,19 +88,7 @@ pub(crate) fn create_serialised_parsec_data_file(
     }
 }
 
-fn save_parsec_data_to_file(
-    file_path: PathBuf,
-    parsec_data: &ParsecData,
-) -> Result<(), ParsecAccessError> {
-    println!("Writing PARSEC data to {}", file_path.display());
-    let file = File::create(&file_path).map_err(ParsecAccessError::Io)?;
-    let buffer = rmp_serde::to_vec(parsec_data).map_err(ParsecAccessError::RmpSerialization)?;
-    let mut writer = BufWriter::new(file);
-    writer.write_all(&buffer).map_err(ParsecAccessError::Io)?;
-    Ok(())
-}
-
-fn read_raw_parsec_data_from_files(
+fn read_parsec_data_from_files(
     metallicity_index: usize,
     data_dir: &PathBuf,
 ) -> Result<ParsecData, ParsecAccessError> {
@@ -123,31 +105,6 @@ fn read_raw_parsec_data_from_files(
         parsec_data.data.push(read_trajectory_file(filepath)?);
     }
     Ok(parsec_data)
-}
-
-pub(crate) fn read_serialised_parsec_file(
-    file_path: PathBuf,
-) -> Result<ParsecData, ParsecAccessError> {
-    println!("Reading PARSEC data from {}", file_path.display());
-    use std::time::Instant;
-
-    let start = Instant::now();
-    let file = File::open(file_path).map_err(ParsecAccessError::Io)?;
-    let duration = start.elapsed();
-    println!("Time elapsed in opening the file is: {:?}", duration);
-
-    let start = Instant::now();
-    let parsec_data: ParsecData = rmp_serde::from_read(file).map_err(ParsecAccessError::RmpDeserialization)?;
-    let duration = start.elapsed();
-    println!("Time elapsed in deserialization is: {:?}", duration);
-
-    if parsec_data.is_valid() {
-        Ok(parsec_data)
-    } else {
-        Err(ParsecAccessError::DataNotAvailable(
-            "Parsec Data".to_string(),
-        ))
-    }
 }
 
 fn is_header(line: &String) -> bool {

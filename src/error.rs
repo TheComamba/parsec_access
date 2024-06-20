@@ -11,10 +11,6 @@ pub enum ParsecAccessError {
     DataNotAvailable(String),
     /// An I/O error occurred.
     Io(std::io::Error),
-    /// An error occurred during MessagePack serialization.
-    RmpSerialization(rmp_serde::encode::Error),
-    /// An error occurred during MessagePack deserialization.
-    RmpDeserialization(rmp_serde::decode::Error),
 }
 
 impl fmt::Display for ParsecAccessError {
@@ -23,12 +19,6 @@ impl fmt::Display for ParsecAccessError {
             ParsecAccessError::Connection(err) => write!(f, "Connection error: {}", err),
             ParsecAccessError::DataNotAvailable(data) => write!(f, "Data {} not available", data),
             ParsecAccessError::Io(err) => write!(f, "I/O error: {}", err),
-            ParsecAccessError::RmpSerialization(err) => {
-                write!(f, "MessagePack serialization error: {}", err)
-            }
-            ParsecAccessError::RmpDeserialization(err) => {
-                write!(f, "MessagePack deserialization error: {}", err)
-            }
         }
     }
 }
