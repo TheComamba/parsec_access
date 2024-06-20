@@ -1,6 +1,8 @@
 use directories::ProjectDirs;
 use flate2::read::GzDecoder;
+use glob::glob;
 use rayon::prelude::*;
+use std::fs;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
@@ -60,6 +62,33 @@ fn ensure_raw_data_files(metallicity_index: usize) -> Result<(), ParsecAccessErr
     let path = data_dir.join(PathBuf::from(dirname));
     if !path.exists() {
         download(metallicity_index)?;
+    }
+    clean_up_old_data_dirs()?;
+    Ok(())
+}
+
+fn clean_up_old_data_dirs() -> Result<(), ParsecAccessError> {
+    let data_dir = get_data_dir()?;
+    let data_dir_str = data_dir
+        .to_str()
+        .ok_or(ParsecAccessError::Io(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "Could not convert data dir to string",
+        )))?;
+    let parts: Vec<&str> = data_dir_str.split('_').collect();
+    let data_dir_glob = parts[..parts.len() - 1].join("_") + "_*";
+
+    let entries = glob(&data_dir_glob).map_err(ParsecAccessError::Glob)?;
+    for entry in entries {
+        match entry {
+            Ok(path) => {
+                if path != data_dir {
+                    println!("Removing old data directory: {:?}", path);
+                    fs::remove_dir_all(&path).map_err(ParsecAccessError::Io)?;
+                }
+            }
+            Err(e) => println!("{:?}", e),
+        }
     }
     Ok(())
 }
