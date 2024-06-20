@@ -1,5 +1,6 @@
 use directories::ProjectDirs;
 use flate2::read::GzDecoder;
+use rayon::prelude::*;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
@@ -100,10 +101,16 @@ fn read_parsec_data_from_files(
         metallicity_in_mass_fraction: METALLICITIES_IN_MASS_FRACTION[metallicity_index],
         data: Vec::new(),
     };
-    for mass_index in 0..filepaths.len() {
-        let filepath = folder_path.join(filepaths[mass_index]);
-        parsec_data.data.push(read_trajectory_file(filepath)?);
-    }
+
+    let data: Vec<_> = filepaths
+        .par_iter()
+        .map(|filepath| {
+            let filepath = folder_path.join(filepath);
+            read_trajectory_file(filepath)
+        })
+        .collect::<Result<_, _>>()?;
+
+    parsec_data.data.extend(data);
     Ok(parsec_data)
 }
 
