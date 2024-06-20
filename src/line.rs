@@ -1,4 +1,3 @@
-use serde::{Deserialize, Serialize};
 use simple_si_units::base::{Distance, Luminosity, Mass, Temperature, Time};
 
 use crate::error::ParsecAccessError;
@@ -11,7 +10,7 @@ pub(super) struct RawParsecLine {
     log_r: f64,
 }
 
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Clone)]
 pub struct ParsecLine {
     pub mass: Mass<f64>,
     pub age: Time<f64>,
