@@ -140,7 +140,7 @@ pub fn get_closest_trajectory(mass_fraction: f64, mass: Mass<f64>) -> &'static T
 /// let parameters = get_parameters(1, 2, 3);
 /// assert!(parameters.mass.to_solar_mass() > 0.);
 /// assert!(parameters.age.to_yr() > 0.);
-/// assert!(parameters.luminous_intensity.to_cd() > 0.);
+/// assert!(parameters.luminosity_in_solar > 0.);
 /// assert!(parameters.temperature.to_K() > 0.);
 /// assert!(parameters.radius.to_km() > 0.);
 /// ```
