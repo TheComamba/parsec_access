@@ -14,7 +14,7 @@ pub struct Trajectory {
     pub initial_mass: Mass<f64>,
     /// The lifetime of the star. This is simply the age of the last entry in the trajectory.
     pub lifetime: Time<f64>,
-    /// The ages of the star in years. This information is redundnat, but useful for looping over the trajectory.
+    /// The ages of the star in years. This information is redundant, but useful for looping over the trajectory.
     pub ages_in_years: Vec<f64>,
 }
 
