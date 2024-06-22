@@ -32,7 +32,7 @@ pub fn is_data_ready() -> bool {
 }
 
 /// Fetches a reference to the ParsecData object for a given metallicity.
-/// This is functionally similar to get_closest_data, but much faster.
+/// This is functionally similar to get_closest_data, but faster by about a factor of 10.
 /// To find the correct metallicity index, use get_closest_metallicity_index_from_mass_fraction.
 ///
 /// # Safety
@@ -55,7 +55,7 @@ pub fn get_data(metallicity_index: usize) -> &'static ParsecData {
 
 /// Fetches a reference to the ParsecData object for the metallicity that is closest to the provided value.
 /// The untyped input value is expected to be a mass fraction of all metals to total mass.
-/// This is a convenience wrapper around the much faster get_data().
+/// This is a convenience wrapper around the faster get_data().
 ///
 /// # Safety
 ///
@@ -77,7 +77,7 @@ pub fn get_closest_data(mass_fraction: f64) -> &'static ParsecData {
 }
 
 /// Fetches a reference to the trajectory for a given metallicity and mass.
-/// This is functionally similar to get_closest_trajectory, but much faster.
+/// This is functionally similar to get_closest_trajectory, but faster by about a factor of 10.
 /// To find the correct metallicity and mass index, use get_closest_metallicity_index_from_mass_fraction and get_closest_mass_index.
 ///
 /// # Safety
@@ -100,7 +100,7 @@ pub fn get_trajectory(metallicity_index: usize, mass_index: usize) -> &'static T
 
 /// Fetches a reference to the trajectory for the metallicity and mass that are closest to the provided values.
 /// The untyped mass_fraction is expected to be the mass fraction of all metals to total mass.
-/// This is a convenience wrapper around the much faster get_trajectory().
+/// This is a convenience wrapper around the faster get_trajectory().
 ///
 /// # Safety
 ///
@@ -124,7 +124,7 @@ pub fn get_closest_trajectory(mass_fraction: f64, mass: Mass<f64>) -> &'static T
 }
 
 /// Fetches a reference to the ParsecLine object for a given metallicity, mass, and age.
-/// This is functionally similar to get_closest_parameters, but much faster.
+/// This is functionally similar to get_closest_parameters, but faster by about a factor of 10.
 /// To find the correct metallicity, mass, and age index, use get_closest_metallicity_index_from_mass_fraction, get_closest_mass_index, and get_closest_age_index.
 ///
 /// # Safety
@@ -154,7 +154,7 @@ pub fn get_parameters(
 
 /// Fetches a reference to the ParsecLine object for the metallicity, mass, and age that are closest to the provided values.
 /// The untyped mass_fraction is expected to be the mass fraction of all metals to total mass.
-/// This is a convenience wrapper around the much faster get_parameters().
+/// This is a convenience wrapper around the faster get_parameters().
 ///
 /// # Safety
 ///
