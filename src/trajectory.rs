@@ -5,7 +5,6 @@ use std::ops::Index;
 
 use super::line::ParsecLine;
 
-
 /// The data struct holding the PARSEC data for a given metallicity and initial mass.
 /// This struct cannot be created directly, but can only be read and accessed through the crate api.
 /// If you know the age index, the contained parameters can be accessed via the index operator.
