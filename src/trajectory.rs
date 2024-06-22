@@ -3,11 +3,18 @@ use std::ops::Index;
 
 use super::line::ParsecLine;
 
+
+/// The data struct holding the PARSEC data for a given metallicity and initial mass.
+/// This struct cannot be created directly, but can only be read and accessed through the crate api.
+/// If you know the age index, the contained parameters can be accessed via the index operator.
 #[derive(Clone)]
 pub struct Trajectory {
     params: Vec<ParsecLine>,
+    /// The initial mass of the star.
     pub initial_mass: Mass<f64>,
+    /// The lifetime of the star. This is simply the age of the last entry in the trajectory.
     pub lifetime: Time<f64>,
+    /// The ages of the star in years. This information is redundnat, but useful for looping over the trajectory.
     pub ages_in_years: Vec<f64>,
 }
 

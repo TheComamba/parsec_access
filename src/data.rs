@@ -5,7 +5,11 @@ use crate::{
     trajectory::Trajectory,
 };
 
+/// The data struct holding the PARSEC data for a given metallicity.
+/// This struct cannot be created directly, but can only be read and accessed through the crate api.
+/// If you know the metallicity index, the contained trajectories can be accessed via the index operator.
 pub struct ParsecData {
+    /// The metallicity of the data in units of mass fraction Z.
     pub metallicity_in_mass_fraction: f64,
     pub(crate) data: Vec<Trajectory>,
 }
