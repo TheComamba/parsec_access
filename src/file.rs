@@ -100,7 +100,19 @@ fn reduce_persisted_data(metallicity_index: usize) -> Result<(), ParsecAccessErr
 }
 
 fn delete_unnecessary_files(folder_path: &PathBuf) -> Result<(), ParsecAccessError> {
+    println!(
+        "Deleting unnecessary files in {}",
+        folder_path.to_string_lossy()
+    );
+
     let pattern = format!("{}/**/*HB.DAT", folder_path.to_string_lossy());
+
+    for entry in glob(&pattern).map_err(ParsecAccessError::GlobPattern)? {
+        let entry = entry.map_err(ParsecAccessError::Glob)?;
+        fs::remove_file(entry).map_err(ParsecAccessError::Io)?;
+    }
+
+    let pattern = format!("{}/**/*ADD.DAT", folder_path.to_string_lossy());
 
     for entry in glob(&pattern).map_err(ParsecAccessError::GlobPattern)? {
         let entry = entry.map_err(ParsecAccessError::Glob)?;
@@ -111,6 +123,8 @@ fn delete_unnecessary_files(folder_path: &PathBuf) -> Result<(), ParsecAccessErr
 }
 
 fn trim_files(folder_path: &PathBuf, metallicity_index: usize) -> Result<(), ParsecAccessError> {
+    println!("Trimming files in {}", folder_path.to_string_lossy());
+
     let required_line_number = ParsecLine::LARGEST_REQUIRED_INDEX + 1;
     let filepaths = FILENAMES[metallicity_index];
     for filepath in filepaths {
@@ -202,6 +216,7 @@ pub(crate) fn get_data_dir() -> Result<PathBuf, ParsecAccessError> {
 mod test {
     use super::*;
     #[test]
+    #[ignore] // This test manipulates the data files while other tests try to read them
     fn reducing_data() {
         for (metallicity_index, _) in METALLICITIES_IN_MASS_FRACTION.iter().enumerate() {
             let result = ensure_data_files(metallicity_index);
