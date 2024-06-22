@@ -1,3 +1,5 @@
+//! Contains the `ParsecData` struct, which holds the PARSEC data for a given metallicity.
+
 use std::ops::Index;
 
 use crate::{

@@ -1,3 +1,5 @@
+//! Contains the `Trajectory` struct, which holds the PARSEC data for a given metallicity and initial mass.
+
 use simple_si_units::base::{Mass, Time};
 use std::ops::Index;
 
