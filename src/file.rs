@@ -100,17 +100,11 @@ fn reduce_persisted_data(metallicity_index: usize) -> Result<(), ParsecAccessErr
 }
 
 fn delete_unnecessary_files(folder_path: &PathBuf) -> Result<(), ParsecAccessError> {
-    let paths = fs::read_dir(folder_path).map_err(ParsecAccessError::Io)?;
+    let pattern = format!("{}/**/*HB.DAT", folder_path.to_string_lossy());
 
-    let filepaths: Vec<_> = paths
-        .filter_map(|entry| entry.ok())
-        .map(|entry| entry.path())
-        .filter(|path| path.extension().and_then(std::ffi::OsStr::to_str) == Some("HB.DAT"))
-        .collect();
-
-    for filepath in filepaths {
-        let filepath = folder_path.join(filepath);
-        fs::remove_file(filepath).map_err(ParsecAccessError::Io)?;
+    for entry in glob(&pattern).map_err(ParsecAccessError::GlobPattern)? {
+        let entry = entry.map_err(ParsecAccessError::Glob)?;
+        fs::remove_file(entry).map_err(ParsecAccessError::Io)?;
     }
 
     Ok(())
@@ -134,7 +128,7 @@ fn trim_file(file_path: &PathBuf, required_line_number: usize) -> Result<(), Par
 
     for line in reader.lines() {
         let line = line.map_err(ParsecAccessError::Io)?;
-        let columns: Vec<&str> = line.split('\t').collect();
+        let columns: Vec<&str> = line.split_whitespace().collect();
         let trimmed_columns = columns
             .into_iter()
             .take(required_line_number)
