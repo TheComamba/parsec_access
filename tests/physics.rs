@@ -60,4 +60,35 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn bolometric_luminosity_fits_radius_and_temperature() {
+        let sun_temperature = Temperature::from_K(5772.);
+        let sun_radius = Distance::from_km(696_300.);
+
+        assert!(is_data_ready());
+        let max_metallicity_index = get_metallicities_in_mass_fractions().len();
+        for metallicity_index in 0..max_metallicity_index {
+            let max_mass_index = get_masses_in_solar(metallicity_index).len();
+            for mass_index in 0..max_mass_index {
+                let trajectory = get_trajectory(metallicity_index, mass_index);
+                let max_age_index = trajectory.ages_in_years.len();
+                for age_index in 0..max_age_index {
+                    let params = &trajectory[age_index];
+                    let luminosity = params.luminosity_in_solar;
+                    let radius_in_solar = params.radius / sun_radius;
+                    let temperature_in_solar = params.temperature / sun_temperature;
+                    let expected_luminosity =
+                        radius_in_solar.powi(2) * temperature_in_solar.powi(4);
+                    assert!(
+                        (luminosity / expected_luminosity - 1.).abs() < 0.01,
+                        "Expected luminosity of {} sol, got {} sol, which is off by a factor of {}",
+                        expected_luminosity,
+                        luminosity,
+                        luminosity / expected_luminosity
+                    );
+                }
+            }
+        }
+    }
 }
