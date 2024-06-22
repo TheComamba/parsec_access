@@ -56,12 +56,13 @@ fn read_trajectory_file(file_path: PathBuf) -> Result<Trajectory, ParsecAccessEr
     Ok(Trajectory::new(lines))
 }
 
-fn ensure_raw_data_files(metallicity_index: usize) -> Result<(), ParsecAccessError> {
+fn ensure_data_files(metallicity_index: usize) -> Result<(), ParsecAccessError> {
     let data_dir = get_data_dir()?;
     let dirname = METALLICITY_ARCHIVES[metallicity_index].replace(".tar.gz", "");
     let path = data_dir.join(PathBuf::from(dirname));
     if !path.exists() {
         download(metallicity_index)?;
+        reduce_persisted_data(metallicity_index)?;
     }
     clean_up_old_data_dirs()?;
     Ok(())
@@ -89,6 +90,63 @@ fn clean_up_old_data_dirs() -> Result<(), ParsecAccessError> {
     Ok(())
 }
 
+fn reduce_persisted_data(metallicity_index: usize) -> Result<(), ParsecAccessError> {
+    let data_dir = get_data_dir()?;
+    let data_dir_name = METALLICITY_ARCHIVES[metallicity_index].replace(".tar.gz", "");
+    let folder_path = data_dir.join(PathBuf::from(data_dir_name));
+    delete_unnecessary_files(&folder_path)?;
+    trim_files(&folder_path, metallicity_index)?;
+    Ok(())
+}
+
+fn delete_unnecessary_files(folder_path: &PathBuf) -> Result<(), ParsecAccessError> {
+    let paths = fs::read_dir(folder_path).map_err(ParsecAccessError::Io)?;
+
+    let filepaths: Vec<_> = paths
+        .filter_map(|entry| entry.ok())
+        .map(|entry| entry.path())
+        .filter(|path| path.extension().and_then(std::ffi::OsStr::to_str) == Some("HB.DAT"))
+        .collect();
+
+    for filepath in filepaths {
+        let filepath = folder_path.join(filepath);
+        fs::remove_file(filepath).map_err(ParsecAccessError::Io)?;
+    }
+
+    Ok(())
+}
+
+fn trim_files(folder_path: &PathBuf, metallicity_index: usize) -> Result<(), ParsecAccessError> {
+    let required_line_number = ParsecLine::LARGEST_REQUIRED_INDEX + 1;
+    let filepaths = FILENAMES[metallicity_index];
+    for filepath in filepaths {
+        let filepath = folder_path.join(filepath);
+        trim_file(&filepath, required_line_number)?;
+    }
+
+    Ok(())
+}
+
+fn trim_file(file_path: &PathBuf, required_line_number: usize) -> Result<(), ParsecAccessError> {
+    let file = File::open(file_path).map_err(ParsecAccessError::Io)?;
+    let reader = BufReader::new(file);
+    let mut lines: Vec<String> = Vec::new();
+
+    for line in reader.lines() {
+        let line = line.map_err(ParsecAccessError::Io)?;
+        let columns: Vec<&str> = line.split('\t').collect();
+        let trimmed_columns = columns
+            .into_iter()
+            .take(required_line_number)
+            .collect::<Vec<&str>>()
+            .join("\t");
+        lines.push(trimmed_columns);
+    }
+
+    fs::write(file_path, lines.join("\n")).map_err(ParsecAccessError::Io)?;
+    Ok(())
+}
+
 pub(crate) fn read_data_files(
     metallicity_index: usize,
     data_dir: &PathBuf,
@@ -110,7 +168,7 @@ fn read_parsec_data_from_files(
     metallicity_index: usize,
     data_dir: &PathBuf,
 ) -> Result<ParsecData, ParsecAccessError> {
-    ensure_raw_data_files(metallicity_index)?;
+    ensure_data_files(metallicity_index)?;
     let data_dir_name = METALLICITY_ARCHIVES[metallicity_index].replace(".tar.gz", "");
     let folder_path = data_dir.join(PathBuf::from(data_dir_name));
     let filepaths = FILENAMES[metallicity_index];
@@ -144,4 +202,18 @@ pub(crate) fn get_data_dir() -> Result<PathBuf, ParsecAccessError> {
     let app = format!("{}_{}", PACKAGE_NAME, PACKAGE_VERSION);
     let project_dirs = ProjectDirs::from("", "the_comamba", &app).ok_or(error)?;
     Ok(project_dirs.data_dir().into())
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn reducing_data() {
+        for (metallicity_index, _) in METALLICITIES_IN_MASS_FRACTION.iter().enumerate() {
+            let result = ensure_data_files(metallicity_index);
+            assert!(result.is_ok(), "{}", result.unwrap_err());
+            let result = reduce_persisted_data(metallicity_index);
+            assert!(result.is_ok(), "{}", result.unwrap_err());
+        }
+    }
 }

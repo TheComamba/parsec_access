@@ -25,6 +25,7 @@ impl ParsecLine {
     const LOG_L_INDEX: usize = 3;
     const LOG_TE_INDEX: usize = 4;
     const LOG_R_INDEX: usize = 5;
+    pub(crate) const LARGEST_REQUIRED_INDEX: usize = 5;
 
     pub(super) fn read(line: String) -> Result<Self, ParsecAccessError> {
         let entries: Vec<&str> = line.split_whitespace().collect();
