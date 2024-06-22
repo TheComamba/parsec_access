@@ -1,4 +1,4 @@
-use simple_si_units::base::{Distance, Luminosity, Mass, Temperature, Time};
+use simple_si_units::base::{Distance, Mass, Temperature, Time};
 
 use crate::error::ParsecAccessError;
 
@@ -14,7 +14,7 @@ pub(super) struct RawParsecLine {
 pub struct ParsecLine {
     pub mass: Mass<f64>,
     pub age: Time<f64>,
-    pub luminous_intensity: Luminosity<f64>,
+    pub luminosity_in_solar: f64,
     pub temperature: Temperature<f64>,
     pub radius: Distance<f64>,
 }
@@ -72,12 +72,10 @@ impl ParsecLine {
 
 impl RawParsecLine {
     fn parse(self) -> ParsecLine {
-        const SOLAR_LUMINOUS_INTENSITY: Luminosity<f64> = Luminosity { cd: 2.98e27 };
-
         ParsecLine {
             mass: Mass::from_solar_mass(self.mass),
             age: Time::from_yr(self.age),
-            luminous_intensity: 10f64.powf(self.log_l) * SOLAR_LUMINOUS_INTENSITY,
+            luminosity_in_solar: 10f64.powf(self.log_l),
             temperature: Temperature::from_K(10f64.powf(self.log_te)),
             radius: Distance::from_cm(10f64.powf(self.log_r)),
         }

@@ -65,7 +65,7 @@ impl Index<usize> for ParsecData {
 
 #[cfg(test)]
 mod test {
-    use simple_si_units::base::{Distance, Luminosity, Mass, Temperature, Time};
+    use simple_si_units::base::{Distance, Mass, Temperature, Time};
 
     use crate::line::ParsecLine;
 
@@ -91,7 +91,7 @@ mod test {
         let valid_line = ParsecLine {
             mass: Mass { kg: 1. },
             age: Time { s: 1. },
-            luminous_intensity: Luminosity { cd: 1. },
+            luminosity_in_solar: 1.,
             temperature: Temperature { K: 1. },
             radius: Distance { m: 1. },
         };
