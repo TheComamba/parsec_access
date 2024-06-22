@@ -1,3 +1,5 @@
+//! Contains the `ParsecLine` struct, which holds the PARSEC data for a given metallicity, initial mass and age.
+
 use simple_si_units::base::{Distance, Mass, Temperature, Time};
 
 use crate::error::ParsecAccessError;
@@ -10,12 +12,19 @@ pub(super) struct RawParsecLine {
     log_r: f64,
 }
 
+/// The data struct holding the PARSEC data for a given metallicity, initial mass and age.
+/// This struct cannot be created directly, but can only be read and accessed through the crate api.
 #[derive(Clone)]
 pub struct ParsecLine {
+    /// The current mass of the star.
     pub mass: Mass<f64>,
+    /// The current age of the star.
     pub age: Time<f64>,
+    /// The luminosity of the star in units solar luminosities.
     pub luminosity_in_solar: f64,
+    /// The current effective temperature of the star.
     pub temperature: Temperature<f64>,
+    /// The current radius of the star.
     pub radius: Distance<f64>,
 }
 
