@@ -8,7 +8,7 @@ license = "MIT"
 name = "parsec_access"
 readme = "README.md"
 repository = "https://github.com/TheComamba/ParsecAccess"
-version = "0.1.0"
+version = "1.0.0"
 
 [dependencies]
 directories = { version = "5.0", default-features = false } # Standard locations on file system
