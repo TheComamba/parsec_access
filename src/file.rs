@@ -78,12 +78,13 @@ fn clean_up_old_data_dirs() -> Result<(), ParsecAccessError> {
         )))?;
     let parts: Vec<&str> = data_dir_str.split('_').collect();
     let data_dir_glob = parts[..parts.len() - 1].join("_") + "_*";
+    let current_folder = current_app_name();
 
     let entries = glob(&data_dir_glob).map_err(ParsecAccessError::GlobPattern)?;
     for entry in entries {
         let path = entry.map_err(ParsecAccessError::Glob)?;
-        if path != data_dir {
-            println!("Removing old data directory: {:?}", path);
+        if !path.to_str().unwrap_or_default().contains(&current_folder) {
+            println!("\nRemoving old data directory: {:?}\n", path);
             fs::remove_dir_all(&path).map_err(ParsecAccessError::Io)?;
         }
     }
@@ -105,20 +106,22 @@ fn delete_unnecessary_files(folder_path: &PathBuf) -> Result<(), ParsecAccessErr
         folder_path.to_string_lossy()
     );
 
-    let pattern = format!("{}/**/*HB.DAT", folder_path.to_string_lossy());
+    delete_files_by_glob(folder_path, "*HB.DAT")?;
+    delete_files_by_glob(folder_path, "*ADD.DAT")?;
+    Ok(())
+}
 
+fn delete_files_by_glob(
+    folder_path: &PathBuf,
+    glob_pattern: &str,
+) -> Result<(), ParsecAccessError> {
+    let mut path = PathBuf::from(folder_path);
+    path.push(glob_pattern);
+    let pattern = path.to_string_lossy().to_string();
     for entry in glob(&pattern).map_err(ParsecAccessError::GlobPattern)? {
         let entry = entry.map_err(ParsecAccessError::Glob)?;
         fs::remove_file(entry).map_err(ParsecAccessError::Io)?;
     }
-
-    let pattern = format!("{}/**/*ADD.DAT", folder_path.to_string_lossy());
-
-    for entry in glob(&pattern).map_err(ParsecAccessError::GlobPattern)? {
-        let entry = entry.map_err(ParsecAccessError::Glob)?;
-        fs::remove_file(entry).map_err(ParsecAccessError::Io)?;
-    }
-
     Ok(())
 }
 
@@ -207,9 +210,13 @@ pub(crate) fn get_data_dir() -> Result<PathBuf, ParsecAccessError> {
         std::io::ErrorKind::Other,
         "Could not get project dirs",
     ));
-    let app = format!("{}_{}", PACKAGE_NAME, PACKAGE_VERSION);
+    let app = current_app_name();
     let project_dirs = ProjectDirs::from("", "the_comamba", &app).ok_or(error)?;
     Ok(project_dirs.data_dir().into())
+}
+
+fn current_app_name() -> String {
+    format!("{}_{}", PACKAGE_NAME, PACKAGE_VERSION)
 }
 
 #[cfg(test)]
