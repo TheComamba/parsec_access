@@ -5,7 +5,7 @@ use rayon::prelude::*;
 use std::fs;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tar::Archive;
 
 use crate::access::masses::FILENAMES;
@@ -125,7 +125,7 @@ fn delete_files_by_glob(
     Ok(())
 }
 
-fn trim_files(folder_path: &PathBuf, metallicity_index: usize) -> Result<(), ParsecAccessError> {
+fn trim_files(folder_path: &Path, metallicity_index: usize) -> Result<(), ParsecAccessError> {
     println!("Trimming files in {}", folder_path.to_string_lossy());
 
     let required_line_number = ParsecLine::LARGEST_REQUIRED_INDEX + 1;
@@ -177,7 +177,7 @@ pub(crate) fn read_data_files(
 
 fn read_parsec_data_from_files(
     metallicity_index: usize,
-    data_dir: &PathBuf,
+    data_dir: &Path,
 ) -> Result<ParsecData, ParsecAccessError> {
     ensure_data_files(metallicity_index)?;
     let data_dir_name = METALLICITY_ARCHIVES[metallicity_index].replace(".tar.gz", "");
@@ -200,7 +200,7 @@ fn read_parsec_data_from_files(
     Ok(parsec_data)
 }
 
-fn is_header(line: &String) -> bool {
+fn is_header(line: &str) -> bool {
     line.chars()
         .any(|c| c.is_alphabetic() && c != 'E' && c != 'e')
 }

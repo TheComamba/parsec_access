@@ -28,7 +28,7 @@ pub fn is_data_ready() -> bool {
             return false;
         }
     }
-    return true;
+    true
 }
 
 /// Fetches a reference to the ParsecData object for a given metallicity.
@@ -50,7 +50,7 @@ pub fn is_data_ready() -> bool {
 /// let first_trajectory = &data[0];
 /// ```
 pub fn get_data(metallicity_index: usize) -> &'static ParsecData {
-    &DATA[metallicity_index]
+    DATA[metallicity_index]
 }
 
 /// Fetches a reference to the ParsecData object for the metallicity that is closest to the provided value.
@@ -297,7 +297,7 @@ pub fn get_closest_metallicity_index_from_fe_dex(fe_dex: f64) -> usize {
 /// }
 /// ```
 pub fn get_masses_in_solar(metallicity_index: usize) -> &'static [f64] {
-    &MASSES[metallicity_index]
+    MASSES[metallicity_index]
 }
 
 /// Finds the closest mass enum variant to the given mass in solar masses.
@@ -320,7 +320,7 @@ pub fn get_masses_in_solar(metallicity_index: usize) -> &'static [f64] {
 /// assert_eq!(index, expected);
 /// ```
 pub fn get_closest_mass_index(metallicity_index: usize, mass: Mass<f64>) -> usize {
-    get_closest_index(&MASSES[metallicity_index], mass.to_solar_mass())
+    get_closest_index(MASSES[metallicity_index], mass.to_solar_mass())
 }
 
 /// Returns a reference to the array of available ages in years.
