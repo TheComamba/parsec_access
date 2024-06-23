@@ -16,8 +16,6 @@ Upon first usage, the PARSEC data is downloaded to and stored on your computer. 
 
 It is then lazily initialised, meaning it gets loaded into memory once you first try to access it. For performance reasons, the accessing functions do not validate the data. The function `is_data_ready()` fills that void. It is good practice to call it once at the beginning of the part of your code that accesses the data.
 
-TODO: Usage example.
-
 # Example
 
 ```Rust

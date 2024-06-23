@@ -11,6 +11,9 @@ jobs:
         steps:
         - uses: actions/checkout@v2
 
+        - name: Assure a re-download of the data
+          run: rm -rf dev_data
+
         - name: Run generate_code.sh
           run: ./scripts/generate_code.sh
 
