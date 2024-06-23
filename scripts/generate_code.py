@@ -67,11 +67,11 @@ MASSES_TEMPLATE = """
 
 {filenames}
 
-pub(crate) static MASSES: [&'static [f64]; {number_of_metallicities}] = [
+pub(crate) static MASSES: [&[f64]; {number_of_metallicities}] = [
         {metallicity_to_masses}
 ];
 
-pub(crate) static FILENAMES: [&'static [&'static str]; {number_of_metallicities}] = [
+pub(crate) static FILENAMES: [&[&str]; {number_of_metallicities}] = [
         {metallicity_to_filenames}
 ];
 """
@@ -283,5 +283,3 @@ def main():
     generate_masses_file(metallicities, metallicity_to_masses, metallicity_and_mass_to_filename)
 
 main()
-
-# TODO: Create a check for updates workflow

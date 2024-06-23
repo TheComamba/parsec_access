@@ -160,7 +160,7 @@ fn trim_file(file_path: &PathBuf, required_line_number: usize) -> Result<(), Par
 
 pub(crate) fn read_data_files(
     metallicity_index: usize,
-    data_dir: &PathBuf,
+    data_dir: &Path,
 ) -> Result<ParsecData, ParsecAccessError> {
     let parsec_data = read_parsec_data_from_files(metallicity_index, data_dir)?;
 

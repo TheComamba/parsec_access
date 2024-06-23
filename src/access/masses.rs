@@ -1735,7 +1735,7 @@ const Z0_0600_FILENAMES: [&str; 99] = [
     "Z0.06Y0.356OUTA1.74_F7_M350.000.DAT",
 ];
 
-pub(crate) static MASSES: [&'static [f64]; 15] = [
+pub(crate) static MASSES: [&[f64]; 15] = [
     &Z0_0001_SORTED_MASSES,
     &Z0_0002_SORTED_MASSES,
     &Z0_0005_SORTED_MASSES,
@@ -1753,7 +1753,7 @@ pub(crate) static MASSES: [&'static [f64]; 15] = [
     &Z0_0600_SORTED_MASSES,
 ];
 
-pub(crate) static FILENAMES: [&'static [&'static str]; 15] = [
+pub(crate) static FILENAMES: [&[&str]; 15] = [
     &Z0_0001_FILENAMES,
     &Z0_0002_FILENAMES,
     &Z0_0005_FILENAMES,
