@@ -105,20 +105,22 @@ fn delete_unnecessary_files(folder_path: &PathBuf) -> Result<(), ParsecAccessErr
         folder_path.to_string_lossy()
     );
 
-    let pattern = format!("{}/**/*HB.DAT", folder_path.to_string_lossy());
+    delete_files_by_glob(folder_path, "*HB.DAT")?;
+    delete_files_by_glob(folder_path, "*ADD.DAT")?;
+    Ok(())
+}
 
+fn delete_files_by_glob(
+    folder_path: &PathBuf,
+    glob_pattern: &str,
+) -> Result<(), ParsecAccessError> {
+    let mut path = PathBuf::from(folder_path);
+    path.push(glob_pattern);
+    let pattern = path.to_string_lossy().to_string();
     for entry in glob(&pattern).map_err(ParsecAccessError::GlobPattern)? {
         let entry = entry.map_err(ParsecAccessError::Glob)?;
         fs::remove_file(entry).map_err(ParsecAccessError::Io)?;
     }
-
-    let pattern = format!("{}/**/*ADD.DAT", folder_path.to_string_lossy());
-
-    for entry in glob(&pattern).map_err(ParsecAccessError::GlobPattern)? {
-        let entry = entry.map_err(ParsecAccessError::Glob)?;
-        fs::remove_file(entry).map_err(ParsecAccessError::Io)?;
-    }
-
     Ok(())
 }
 
