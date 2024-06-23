@@ -78,12 +78,13 @@ fn clean_up_old_data_dirs() -> Result<(), ParsecAccessError> {
         )))?;
     let parts: Vec<&str> = data_dir_str.split('_').collect();
     let data_dir_glob = parts[..parts.len() - 1].join("_") + "_*";
+    let current_folder = current_app_name();
 
     let entries = glob(&data_dir_glob).map_err(ParsecAccessError::GlobPattern)?;
     for entry in entries {
         let path = entry.map_err(ParsecAccessError::Glob)?;
-        if path != data_dir {
-            println!("Removing old data directory: {:?}", path);
+        if path.to_str().unwrap_or_default().contains(&current_folder) {
+            println!("\nRemoving old data directory: {:?}\n", path);
             fs::remove_dir_all(&path).map_err(ParsecAccessError::Io)?;
         }
     }
@@ -209,9 +210,13 @@ pub(crate) fn get_data_dir() -> Result<PathBuf, ParsecAccessError> {
         std::io::ErrorKind::Other,
         "Could not get project dirs",
     ));
-    let app = format!("{}_{}", PACKAGE_NAME, PACKAGE_VERSION);
+    let app = current_app_name();
     let project_dirs = ProjectDirs::from("", "the_comamba", &app).ok_or(error)?;
     Ok(project_dirs.data_dir().into())
+}
+
+fn current_app_name() -> String {
+    format!("{}_{}", PACKAGE_NAME, PACKAGE_VERSION)
 }
 
 #[cfg(test)]
