@@ -1,6 +1,6 @@
 //! Contains the `ParsecLine` struct, which holds the PARSEC data for a given metallicity, initial mass and age.
 
-use simple_si_units::base::{Distance, Mass, Temperature, Time};
+use quantity::{Length, Mass, Temperature, Time, KELVIN};
 
 use crate::error::ParsecAccessError;
 
@@ -17,15 +17,15 @@ pub(super) struct RawParsecLine {
 #[derive(Clone)]
 pub struct ParsecLine {
     /// The current mass of the star.
-    pub mass: Mass<f64>,
+    pub mass: Mass,
     /// The current age of the star.
-    pub age: Time<f64>,
+    pub age: Time,
     /// The luminosity of the star in units solar luminosities.
     pub luminosity_in_solar: f64,
     /// The current effective temperature of the star.
-    pub temperature: Temperature<f64>,
+    pub temperature: Temperature,
     /// The current radius of the star.
-    pub radius: Distance<f64>,
+    pub radius: Length,
 }
 
 impl ParsecLine {
@@ -82,10 +82,10 @@ impl ParsecLine {
 impl RawParsecLine {
     fn parse(self) -> ParsecLine {
         ParsecLine {
-            mass: Mass::from_solar_mass(self.mass),
-            age: Time::from_yr(self.age),
+            mass: self.mass,
+            age: self.age,
             luminosity_in_solar: 10f64.powf(self.log_l),
-            temperature: Temperature::from_K(10f64.powf(self.log_te)),
+            temperature: 10f64.powf(self.log_te) * KELVIN,
             radius: Distance::from_cm(10f64.powf(self.log_r)),
         }
     }
