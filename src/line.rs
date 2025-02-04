@@ -2,7 +2,7 @@
 
 use uom::si::{
     f64::{Length, Mass, ThermodynamicTemperature, Time},
-    length::centimeter,
+    length::kilometer,
     thermodynamic_temperature::kelvin,
     time::year,
 };
@@ -88,12 +88,13 @@ impl RawParsecLine {
     fn parse(self) -> ParsecLine {
         let kelvins = 10f64.powf(self.log_te);
         let centimeters = 10f64.powf(self.log_r);
+        let kilometers = centimeters / 1e5;
         ParsecLine {
             mass: Mass::new::<solar>(self.mass),
             age: Time::new::<year>(self.age),
             luminosity_in_solar: 10f64.powf(self.log_l),
             temperature: ThermodynamicTemperature::new::<kelvin>(kelvins),
-            radius: Length::new::<centimeter>(centimeters),
+            radius: Length::new::<kilometer>(kilometers),
         }
     }
 }

@@ -1,5 +1,10 @@
 //! Provides a set of api functions exposing the main functionality of this crate.
 
+use uom::si::{
+    f64::{Mass, Time},
+    time::year,
+};
+
 use crate::{
     access::{
         data::DATA,
@@ -9,6 +14,7 @@ use crate::{
     data::ParsecData,
     line::ParsecLine,
     trajectory::Trajectory,
+    units::solar,
 };
 
 /// Loads the Parsec data and makes sure that it is valid.
@@ -115,7 +121,7 @@ pub fn get_trajectory(metallicity_index: usize, mass_index: usize) -> &'static T
 /// assert!(trajectory.initial_mass.to_solar_mass() > 0.9);
 /// assert!(trajectory.initial_mass.to_solar_mass() < 1.1);
 /// ```
-pub fn get_closest_trajectory(mass_fraction: f64, mass: Mass<f64>) -> &'static Trajectory {
+pub fn get_closest_trajectory(mass_fraction: f64, mass: Mass) -> &'static Trajectory {
     let metallicity_index = get_closest_metallicity_index_from_mass_fraction(mass_fraction);
     let mass_index = get_closest_mass_index(metallicity_index, mass);
     get_trajectory(metallicity_index, mass_index)
@@ -172,11 +178,7 @@ pub fn get_parameters(
 /// assert!(parameters.age > Time::from_Gyr(0.9));
 /// assert!(parameters.age < Time::from_Gyr(1.1));
 /// ```
-pub fn get_closest_parameters(
-    mass_fraction: f64,
-    mass: Mass<f64>,
-    age: Time<f64>,
-) -> &'static ParsecLine {
+pub fn get_closest_parameters(mass_fraction: f64, mass: Mass, age: Time) -> &'static ParsecLine {
     let metallicity_index = get_closest_metallicity_index_from_mass_fraction(mass_fraction);
     let mass_index = get_closest_mass_index(metallicity_index, mass);
     let age_index = get_closest_age_index(metallicity_index, mass_index, age);
@@ -317,8 +319,8 @@ pub fn get_masses_in_solar(metallicity_index: usize) -> &'static [f64] {
 /// let expected = get_masses_in_solar(0).len() - 1;
 /// assert_eq!(index, expected);
 /// ```
-pub fn get_closest_mass_index(metallicity_index: usize, mass: Mass<f64>) -> usize {
-    get_closest_index(MASSES[metallicity_index], mass.to_solar_mass())
+pub fn get_closest_mass_index(metallicity_index: usize, mass: Mass) -> usize {
+    get_closest_index(MASSES[metallicity_index], mass.get::<solar>())
 }
 
 /// Returns a reference to the array of available ages in years.
@@ -375,10 +377,10 @@ pub fn get_ages_in_years(metallicity_index: usize, mass_index: usize) -> &'stati
 /// let expected = get_ages_in_years(0, 0).len() - 1;
 /// assert_eq!(index, expected);
 /// ```
-pub fn get_closest_age_index(metallicity_index: usize, mass_index: usize, age: Time<f64>) -> usize {
+pub fn get_closest_age_index(metallicity_index: usize, mass_index: usize, age: Time) -> usize {
     get_closest_index(
         &DATA[metallicity_index].data[mass_index].ages_in_years,
-        age.to_yr(),
+        age.get::<year>(),
     )
 }
 
