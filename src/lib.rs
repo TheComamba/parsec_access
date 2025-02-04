@@ -1,6 +1,8 @@
 #![warn(clippy::unwrap_used)]
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
+#[macro_use]
+extern crate uom;
 
 mod access;
 pub mod data;

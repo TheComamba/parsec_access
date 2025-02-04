@@ -1,3 +1,6 @@
-use quantity::{Time, DAY};
+unit! {
+    system: uom::si;
+    quantity: uom::si::mass;
 
-pub(crate) const YEAR: Time = 365.2425 * DAY;
+    @solar: 1.988416E30; "M☉", "solar mass", "solar masses";
+}

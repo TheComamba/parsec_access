@@ -1,8 +1,13 @@
 //! Contains the `ParsecLine` struct, which holds the PARSEC data for a given metallicity, initial mass and age.
 
-use quantity::{Length, Mass, Temperature, Time, KELVIN};
+use uom::si::{
+    f64::{Length, Mass, ThermodynamicTemperature, Time},
+    length::centimeter,
+    thermodynamic_temperature::kelvin,
+    time::year,
+};
 
-use crate::error::ParsecAccessError;
+use crate::{error::ParsecAccessError, units::solar};
 
 pub(super) struct RawParsecLine {
     mass: f64,
@@ -23,7 +28,7 @@ pub struct ParsecLine {
     /// The luminosity of the star in units solar luminosities.
     pub luminosity_in_solar: f64,
     /// The current effective temperature of the star.
-    pub temperature: Temperature,
+    pub temperature: ThermodynamicTemperature,
     /// The current radius of the star.
     pub radius: Length,
 }
@@ -81,12 +86,14 @@ impl ParsecLine {
 
 impl RawParsecLine {
     fn parse(self) -> ParsecLine {
+        let kelvins = 10f64.powf(self.log_te);
+        let centimeters = 10f64.powf(self.log_r);
         ParsecLine {
-            mass: self.mass,
-            age: self.age,
+            mass: Mass::new::<solar>(self.mass),
+            age: Time::new::<year>(self.age),
             luminosity_in_solar: 10f64.powf(self.log_l),
-            temperature: 10f64.powf(self.log_te) * KELVIN,
-            radius: Distance::from_cm(10f64.powf(self.log_r)),
+            temperature: ThermodynamicTemperature::new::<kelvin>(kelvins),
+            radius: Length::new::<centimeter>(centimeters),
         }
     }
 }
