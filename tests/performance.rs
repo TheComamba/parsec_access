@@ -3,10 +3,13 @@ use parsec_access::{
     units::solar,
 };
 use serial_test::serial;
-use uom::si::{
-    f64::{Mass, Time},
-    mass::kilogram,
-    time::year,
+use uom::{
+    fmt::DisplayStyle,
+    si::{
+        f64::{Mass, Time},
+        mass::kilogram,
+        time::year,
+    },
 };
 
 const N: usize = 1e6 as usize;
@@ -40,7 +43,10 @@ fn get_parameters_is_fast() {
         total_mass += m;
     }
     let elapsed = now.elapsed();
-    println!("Collected a total mass of {} solar masses.", total_mass);
+    println!(
+        "Collected a total mass of {} solar masses.",
+        total_mass.into_format_args(solar, DisplayStyle::Abbreviation)
+    );
 
     println!(
         "Accessing {} data points took {:?}, or {:?} per access",
@@ -83,7 +89,10 @@ fn get_closest_parameters_is_reasonably_fast() {
         total_mass += m;
     }
     let elapsed = now.elapsed();
-    println!("Collected a total mass of {} solar masses.", total_mass);
+    println!(
+        "Collected a total mass of {} solar masses.",
+        total_mass.into_format_args(solar, DisplayStyle::Abbreviation)
+    );
 
     println!(
         "Accessing {} data points took {:?}, or {:?} per access",

@@ -5,11 +5,14 @@ use parsec_access::{
     },
     units::solar,
 };
-use uom::si::{
-    f64::{Length, Mass, ThermodynamicTemperature, Time},
-    length::kilometer,
-    thermodynamic_temperature::kelvin,
-    time::year,
+use uom::{
+    fmt::DisplayStyle,
+    si::{
+        f64::{Length, Mass, ThermodynamicTemperature, Time},
+        length::kilometer,
+        thermodynamic_temperature::kelvin,
+        time::year,
+    },
 };
 
 #[test]
@@ -26,19 +29,23 @@ fn recreating_the_sun() {
         "Expected luminosity of 1 sol, got {}",
         params.luminosity_in_solar,
     );
+    let ratio = params.temperature.get::<kelvin>() / sun_temperature.get::<kelvin>();
     assert!(
-        (params.temperature / sun_temperature - 1.).abs() < 0.15,
+        (ratio - 1.).abs() < 0.15,
         "Expected {}, got {}, which is off by a factor of {}",
-        sun_temperature,
-        params.temperature,
-        params.temperature / sun_temperature
+        sun_temperature.into_format_args(kelvin, DisplayStyle::Abbreviation),
+        params
+            .temperature
+            .into_format_args(kelvin, DisplayStyle::Abbreviation),
+        ratio,
     );
+    let ratio = params.radius.get::<kilometer>() / sun_radius.get::<kilometer>();
     assert!(
-        (params.radius / sun_radius - 1.).abs() < 0.15,
+        (ratio - 1.).abs() < 0.15,
         "Expected {}, got {}, which is off by a factor of {}",
-        sun_radius,
-        params.radius,
-        params.radius / sun_radius
+        sun_radius.get::<kilometer>(),
+        params.radius.get::<kilometer>(),
+        ratio
     );
 }
 
@@ -59,9 +66,9 @@ fn lifetime_mostly_decreases_with_mass() {
                     "Metallicity index is {}, lifetime of star {} is {} years, while lifetime of star {} is {} years",
                     metallicity_index,
                     mass_index,
-                    lifetime,
+                    lifetime.into_format_args(year, DisplayStyle::Abbreviation),
                     mass_index - 1,
-                    previous_lifetime
+                    previous_lifetime.into_format_args(year, DisplayStyle::Abbreviation)
                 );
         }
     }
@@ -82,15 +89,18 @@ fn bolometric_luminosity_fits_radius_and_temperature() {
             for age_index in 0..max_age_index {
                 let params = &trajectory[age_index];
                 let luminosity = params.luminosity_in_solar;
-                let radius_in_solar = params.radius / sun_radius;
-                let temperature_in_solar = params.temperature / sun_temperature;
+                let radius_in_solar =
+                    params.radius.get::<kilometer>() / sun_radius.get::<kilometer>();
+                let temperature_in_solar =
+                    params.temperature.get::<kelvin>() / sun_temperature.get::<kelvin>();
                 let expected_luminosity = radius_in_solar.powi(2) * temperature_in_solar.powi(4);
+                let ratio = luminosity / expected_luminosity;
                 assert!(
-                    (luminosity / expected_luminosity - 1.).abs() < 0.01,
+                    (ratio - 1.).abs() < 0.01,
                     "Expected luminosity of {} sol, got {} sol, which is off by a factor of {}",
                     expected_luminosity,
                     luminosity,
-                    luminosity / expected_luminosity
+                    ratio
                 );
             }
         }
