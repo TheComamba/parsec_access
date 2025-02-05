@@ -1,4 +1,4 @@
-use directories::ProjectDirs;
+use etcetera::{choose_app_strategy, AppStrategy, AppStrategyArgs};
 use flate2::read::GzDecoder;
 use glob::glob;
 use rayon::prelude::*;
@@ -206,13 +206,17 @@ fn is_header(line: &str) -> bool {
 }
 
 pub(crate) fn get_data_dir() -> Result<PathBuf, ParsecAccessError> {
-    let error = ParsecAccessError::Io(std::io::Error::new(
-        std::io::ErrorKind::Other,
-        "Could not get project dirs",
-    ));
-    let app = current_app_name();
-    let project_dirs = ProjectDirs::from("", "the_comamba", &app).ok_or(error)?;
-    Ok(project_dirs.data_dir().into())
+    let top_level_domain = "".to_string();
+    let author = "the_comamba".to_string();
+    let app_name = current_app_name();
+    let strategy_args = AppStrategyArgs {
+        top_level_domain,
+        author,
+        app_name,
+    };
+    let strategy =
+        choose_app_strategy(strategy_args).map_err(|e| ParsecAccessError::Other(e.to_string()))?;
+    Ok(strategy.config_dir())
 }
 
 fn current_app_name() -> String {
