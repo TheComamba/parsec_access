@@ -11,7 +11,7 @@ mod file;
 pub mod getters;
 pub mod line;
 pub mod trajectory;
-mod units;
+pub mod units;
 
 const PACKAGE_NAME: &str = env!("CARGO_PKG_NAME");
 const PACKAGE_VERSION: &str = env!("CARGO_PKG_VERSION");

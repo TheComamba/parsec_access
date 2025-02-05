@@ -1,7 +1,9 @@
-
-use parsec_access::getters::{
-    get_closest_parameters, get_masses_in_solar, get_metallicities_in_mass_fractions,
-    get_trajectory, is_data_ready,
+use parsec_access::{
+    getters::{
+        get_closest_parameters, get_masses_in_solar, get_metallicities_in_mass_fractions,
+        get_trajectory, is_data_ready,
+    },
+    units::solar,
 };
 use uom::si::{
     f64::{Length, Mass, ThermodynamicTemperature, Time},

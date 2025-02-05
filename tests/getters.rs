@@ -1,8 +1,10 @@
-
-use parsec_access::getters::{
-    get_ages_in_years, get_closest_age_index, get_closest_mass_index,
-    get_closest_metallicity_index_from_mass_fraction, get_masses_in_solar,
-    get_metallicities_in_mass_fractions, is_data_ready,
+use parsec_access::{
+    getters::{
+        get_ages_in_years, get_closest_age_index, get_closest_mass_index,
+        get_closest_metallicity_index_from_mass_fraction, get_masses_in_solar,
+        get_metallicities_in_mass_fractions, is_data_ready,
+    },
+    units::solar,
 };
 use uom::si::{
     f64::{Mass, Time},

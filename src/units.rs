@@ -1,3 +1,5 @@
+//! This module extends the `uom` crate with additional units and quantities.
+
 unit! {
     system: uom::si;
     quantity: uom::si::mass;
