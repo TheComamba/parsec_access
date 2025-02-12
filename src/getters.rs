@@ -14,7 +14,7 @@ use crate::{
     data::ParsecData,
     line::ParsecLine,
     trajectory::Trajectory,
-    units::solar,
+    units::*,
 };
 
 /// Loads the Parsec data and makes sure that it is valid.
@@ -92,11 +92,13 @@ pub fn get_closest_data(mass_fraction: f64) -> &'static ParsecData {
 /// # Example
 /// ```
 /// use parsec_access::getters::{get_trajectory, is_data_ready};
+/// use parsec_access::units::*;
+/// use uom::si::time::year;
 ///
 /// assert!(is_data_ready());
 /// let trajectory = get_trajectory(1, 2);
-/// assert!(trajectory.initial_mass.to_solar_mass() > 0.);
-/// assert!(trajectory.lifetime.to_yr() > 0.);
+/// assert!(trajectory.initial_mass.get::<solar>() > 0.);
+/// assert!(trajectory.lifetime.get::<year>() > 0.);
 /// ```
 pub fn get_trajectory(metallicity_index: usize, mass_index: usize) -> &'static Trajectory {
     &DATA[metallicity_index].data[mass_index]
@@ -114,7 +116,6 @@ pub fn get_trajectory(metallicity_index: usize, mass_index: usize) -> &'static T
 /// # Example
 /// ```
 /// use parsec_access::getters::{get_closest_trajectory, is_data_ready};
-/// use simple_si_units::base::Mass;
 ///
 /// assert!(is_data_ready());
 /// let trajectory = get_closest_trajectory(0.01, Mass::from_solar_mass(1.));
@@ -168,15 +169,16 @@ pub fn get_parameters(
 /// # Example
 /// ```
 /// use parsec_access::getters::{get_closest_parameters, is_data_ready};
-/// use simple_si_units::base::Mass;
-/// use simple_si_units::base::Time;
+/// use parsec_access::units::*;
+/// use uom::units::Mass;
+/// use uom::units::Time;
 ///
 /// assert!(is_data_ready());
-/// let parameters = get_closest_parameters(0.01, Mass::from_solar_mass(1.), Time::from_Gyr(1.));
-/// assert!(parameters.mass > Mass::from_solar_mass(0.9));
-/// assert!(parameters.mass < Mass::from_solar_mass(1.1));
-/// assert!(parameters.age > Time::from_Gyr(0.9));
-/// assert!(parameters.age < Time::from_Gyr(1.1));
+/// let parameters = get_closest_parameters(0.01, Mass::new::<solar>(1.), Time::new::<gigayears>(1.));
+/// assert!(parameters.mass > Mass::new::<solar>(0.9));
+/// assert!(parameters.mass < Mass::new::<solar>(1.1));
+/// assert!(parameters.age > Time::new::<gigayears>(0.9));
+/// assert!(parameters.age < Time::new::<gigayears>(1.1));
 /// ```
 pub fn get_closest_parameters(mass_fraction: f64, mass: Mass, age: Time) -> &'static ParsecLine {
     let metallicity_index = get_closest_metallicity_index_from_mass_fraction(mass_fraction);

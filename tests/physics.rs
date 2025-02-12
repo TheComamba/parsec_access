@@ -3,7 +3,7 @@ use parsec_access::{
         get_closest_parameters, get_masses_in_solar, get_metallicities_in_mass_fractions,
         get_trajectory, is_data_ready,
     },
-    units::solar,
+    units::*,
 };
 use uom::{
     fmt::DisplayStyle,

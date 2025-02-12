@@ -7,7 +7,7 @@ use uom::si::{
     time::year,
 };
 
-use crate::units::solar;
+use crate::units::*;
 
 use super::line::ParsecLine;
 

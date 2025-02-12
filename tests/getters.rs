@@ -4,7 +4,7 @@ use parsec_access::{
         get_closest_metallicity_index_from_mass_fraction, get_masses_in_solar,
         get_metallicities_in_mass_fractions, is_data_ready,
     },
-    units::solar,
+    units::*,
 };
 use uom::si::{
     f64::{Mass, Time},

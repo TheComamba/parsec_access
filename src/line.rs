@@ -7,7 +7,7 @@ use uom::si::{
     time::year,
 };
 
-use crate::{error::ParsecAccessError, units::solar};
+use crate::{error::ParsecAccessError, units::*};
 
 pub(super) struct RawParsecLine {
     mass: f64,
