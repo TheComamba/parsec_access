@@ -117,6 +117,7 @@ pub fn get_trajectory(metallicity_index: usize, mass_index: usize) -> &'static T
 /// ```
 /// use parsec_access::getters::{get_closest_trajectory, is_data_ready};
 /// use parsec_access::units::*;
+/// use uom::si::mass::Mass;
 ///
 /// assert!(is_data_ready());
 /// let trajectory = get_closest_trajectory(0.01, Mass::new::<solar>(1.));
@@ -173,8 +174,7 @@ pub fn get_parameters(
 /// ```
 /// use parsec_access::getters::{get_closest_parameters, is_data_ready};
 /// use parsec_access::units::*;
-/// use uom::units::Mass;
-/// use uom::units::Time;
+/// use uom::si::{mass::Mass, time::Time};
 ///
 /// assert!(is_data_ready());
 /// let parameters = get_closest_parameters(0.01, Mass::new::<solar>(1.), Time::new::<gigayear>(1.));
@@ -312,15 +312,16 @@ pub fn get_masses_in_solar(metallicity_index: usize) -> &'static [f64] {
 /// # Example
 /// ```
 /// use parsec_access::getters::{get_closest_mass_index, get_masses_in_solar};
-/// use simple_si_units::base::Mass;
+/// use parsec_access::units::*;
+/// use uom::si::mass::Mass;
 ///
-/// let index = get_closest_mass_index(0, Mass::from_solar_mass(1.));
+/// let index = get_closest_mass_index(0, Mass::new::<solar>(1.));
 /// let expected = get_masses_in_solar(0)[index];
 /// assert!((expected-1.).abs() < 1e-8);
-/// let index = get_closest_mass_index(0, Mass::from_solar_mass(0.));
+/// let index = get_closest_mass_index(0, Mass::new::<solar>(0.));
 /// let expected = 0;
 /// assert_eq!(index, expected);
-/// let index = get_closest_mass_index(0, Mass::from_solar_mass(1000.));
+/// let index = get_closest_mass_index(0, Mass::new::<solar>(1000.));
 /// let expected = get_masses_in_solar(0).len() - 1;
 /// assert_eq!(index, expected);
 /// ```
@@ -369,18 +370,18 @@ pub fn get_ages_in_years(metallicity_index: usize, mass_index: usize) -> &'stati
 /// ```
 /// use parsec_access::getters::{get_ages_in_years, get_closest_age_index, is_data_ready};
 /// use parsec_access::units::*;
-/// use uom::units::Time;
-/// use uom::si::time::year;
+/// use uom::si::time::{Time, year};
 ///
 /// assert!(is_data_ready());
 ///
-/// let index = get_closest_age_index(0, 0, Time::from_Gyr(1.));
+/// let index = get_closest_age_index(0, 0, Time::new::<gigayear>(1.));
 /// let expected = get_ages_in_years(0, 0)[index];
-/// assert!((Time::new::<year>(expected)-Time::new::<gigayear>(1.)).get::<gigayear>().abs() < 1e-1);
-/// let index = get_closest_age_index(0, 0, Time::from_yr(0.));
+/// let diff_in_gigayears = Time::new::<year>(expected).get::<gigayear>() - 1.;
+/// assert!(diff_in_gigayears.abs() < 1e-1);
+/// let index = get_closest_age_index(0, 0, Time::new::<year>(0.));
 /// let expected = 0;
 /// assert_eq!(index, expected);
-/// let index = get_closest_age_index(0, 0, Time::from_yr(1e15));
+/// let index = get_closest_age_index(0, 0, Time::new::<year>(1e15));
 /// let expected = get_ages_in_years(0, 0).len() - 1;
 /// assert_eq!(index, expected);
 /// ```
