@@ -15,6 +15,8 @@ pub enum ParsecAccessError {
     GlobPattern(glob::PatternError),
     /// An I/O error occurred.
     Io(std::io::Error),
+    /// Some other error occurred.
+    Other(String),
 }
 
 impl fmt::Display for ParsecAccessError {
@@ -25,6 +27,7 @@ impl fmt::Display for ParsecAccessError {
             ParsecAccessError::Glob(err) => write!(f, "Glob error: {}", err),
             ParsecAccessError::GlobPattern(err) => write!(f, "Glob pattern error: {}", err),
             ParsecAccessError::Io(err) => write!(f, "I/O error: {}", err),
+            ParsecAccessError::Other(err) => write!(f, "Other error: {}", err),
         }
     }
 }

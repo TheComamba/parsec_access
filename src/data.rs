@@ -71,7 +71,13 @@ impl Index<usize> for ParsecData {
 
 #[cfg(test)]
 mod test {
-    use simple_si_units::base::{Distance, Mass, Temperature, Time};
+    use uom::si::{
+        f64::{Length, Mass, ThermodynamicTemperature, Time},
+        length::meter,
+        mass::kilogram,
+        thermodynamic_temperature::kelvin,
+        time::second,
+    };
 
     use crate::line::ParsecLine;
 
@@ -95,11 +101,11 @@ mod test {
         let mut data = ParsecData::default();
         data.metallicity_in_mass_fraction = 0.05;
         let valid_line = ParsecLine {
-            mass: Mass { kg: 1. },
-            age: Time { s: 1. },
+            mass: Mass::new::<kilogram>(1.),
+            age: Time::new::<second>(1.),
             luminosity_in_solar: 1.,
-            temperature: Temperature { K: 1. },
-            radius: Distance { m: 1. },
+            temperature: ThermodynamicTemperature::new::<kelvin>(1.),
+            radius: Length::new::<meter>(1.),
         };
         data.data.push(Trajectory::new(vec![valid_line]));
         data.data.push(Trajectory::new(vec![]));

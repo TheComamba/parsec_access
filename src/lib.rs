@@ -1,14 +1,17 @@
 #![warn(clippy::unwrap_used)]
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
+#[macro_use]
+extern crate uom;
 
-pub(crate) mod access;
+mod access;
 pub mod data;
 pub mod error;
-pub(crate) mod file;
+mod file;
 pub mod getters;
 pub mod line;
 pub mod trajectory;
+pub mod units;
 
-pub(crate) const PACKAGE_NAME: &str = env!("CARGO_PKG_NAME");
-pub(crate) const PACKAGE_VERSION: &str = env!("CARGO_PKG_VERSION");
+const PACKAGE_NAME: &str = env!("CARGO_PKG_NAME");
+const PACKAGE_VERSION: &str = env!("CARGO_PKG_VERSION");

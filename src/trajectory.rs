@@ -1,7 +1,13 @@
 //! Contains the `Trajectory` struct, which holds the PARSEC data for a given metallicity and initial mass.
 
-use simple_si_units::base::{Mass, Time};
 use std::ops::Index;
+
+use uom::si::{
+    f64::{Mass, Time},
+    time::year,
+};
+
+use crate::units::*;
 
 use super::line::ParsecLine;
 
@@ -12,9 +18,9 @@ use super::line::ParsecLine;
 pub struct Trajectory {
     params: Vec<ParsecLine>,
     /// The initial mass of the star.
-    pub initial_mass: Mass<f64>,
+    pub initial_mass: Mass,
     /// The lifetime of the star. This is simply the age of the last entry in the trajectory.
-    pub lifetime: Time<f64>,
+    pub lifetime: Time,
     /// The ages of the star in years. This information is redundant, but useful for looping over the trajectory.
     pub ages_in_years: Vec<f64>,
 }
@@ -31,13 +37,13 @@ impl Trajectory {
     pub(super) fn new(params: Vec<ParsecLine>) -> Self {
         let initial_mass = match params.first() {
             Some(params) => params.mass,
-            None => Mass { kg: 0. },
+            None => Mass::new::<solar>(0.),
         };
         let lifetime = match params.last() {
             Some(last) => last.age,
-            None => Time { s: 0. },
+            None => Time::new::<year>(0.),
         };
-        let ages_in_years = params.iter().map(|line| line.age.to_yr()).collect();
+        let ages_in_years = params.iter().map(|line| line.age.get::<year>()).collect();
 
         Self {
             params,
