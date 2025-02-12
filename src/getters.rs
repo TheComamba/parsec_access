@@ -117,7 +117,7 @@ pub fn get_trajectory(metallicity_index: usize, mass_index: usize) -> &'static T
 /// ```
 /// use parsec_access::getters::{get_closest_trajectory, is_data_ready};
 /// use parsec_access::units::*;
-/// use uom::si::mass::Mass;
+/// use uom::si::f64::Mass;
 ///
 /// assert!(is_data_ready());
 /// let trajectory = get_closest_trajectory(0.01, Mass::new::<solar>(1.));
@@ -174,7 +174,7 @@ pub fn get_parameters(
 /// ```
 /// use parsec_access::getters::{get_closest_parameters, is_data_ready};
 /// use parsec_access::units::*;
-/// use uom::si::{mass::Mass, time::Time};
+/// use uom::si::f64::{Mass, Time};
 ///
 /// assert!(is_data_ready());
 /// let parameters = get_closest_parameters(0.01, Mass::new::<solar>(1.), Time::new::<gigayear>(1.));
@@ -313,7 +313,7 @@ pub fn get_masses_in_solar(metallicity_index: usize) -> &'static [f64] {
 /// ```
 /// use parsec_access::getters::{get_closest_mass_index, get_masses_in_solar};
 /// use parsec_access::units::*;
-/// use uom::si::mass::Mass;
+/// use uom::si::f64::Mass;
 ///
 /// let index = get_closest_mass_index(0, Mass::new::<solar>(1.));
 /// let expected = get_masses_in_solar(0)[index];
@@ -370,7 +370,8 @@ pub fn get_ages_in_years(metallicity_index: usize, mass_index: usize) -> &'stati
 /// ```
 /// use parsec_access::getters::{get_ages_in_years, get_closest_age_index, is_data_ready};
 /// use parsec_access::units::*;
-/// use uom::si::time::{Time, year};
+/// use uom::si::f64::Time;
+/// use uom::si::time::year;
 ///
 /// assert!(is_data_ready());
 ///

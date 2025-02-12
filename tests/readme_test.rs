@@ -2,7 +2,8 @@
 fn readme_test() {
     use parsec_access::getters::*;
     // The input for initial mass and age is typed using the uom crate.
-    use uom::si::{length::kilometer, mass::Mass, thermodynamic_temperature::kelvin, time::Time};
+    use uom::si::f64::{Mass, Time};
+    use uom::si::{length::kilometer, thermodynamic_temperature::kelvin};
     // The parsec_access crate introduces some custom units.
     use parsec_access::units::*;
 
