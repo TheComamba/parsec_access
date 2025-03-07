@@ -11,7 +11,7 @@ repository = "https://github.com/TheComamba/ParsecAccess"
 version = "2.1.0"
 
 [dependencies]
-etcetera = { version = "0.9.0", default-features = false } # Standard locations on file system
+etcetera = { version = "0.10.0", default-features = false } # Standard locations on file system
 flate2 = { version = "1.0", default-features = false, features = ["rust_backend", "zlib-ng-compat"] } # Decompression
 glob = { version = "0.3.0", default-features = false } # File system traversal
 lazy_static = { version = "1.4", default-features = false }
