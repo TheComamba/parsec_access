@@ -1,10 +1,8 @@
-use parsec_access::{
-    getters::{
-        get_ages_in_years, get_closest_age_index, get_closest_mass_index,
-        get_closest_metallicity_index_from_mass_fraction, get_masses_in_solar,
-        get_metallicities_in_mass_fractions, is_data_ready,
-    },
-    units::*,
+use astro_units::mass::solar_mass;
+use parsec_access::getters::{
+    get_ages_in_years, get_closest_age_index, get_closest_mass_index,
+    get_closest_metallicity_index_from_mass_fraction, get_masses_in_solar,
+    get_metallicities_in_mass_fractions, is_data_ready,
 };
 use uom::si::{
     f64::{Mass, Time},
@@ -28,7 +26,7 @@ fn masses_are_mapped_to_themselves() {
     for (expected_index, expected_value) in
         get_masses_in_solar(metallicity_index).iter().enumerate()
     {
-        let mass = Mass::new::<solar>(*expected_value);
+        let mass = Mass::new::<solar_mass>(*expected_value);
         let index = get_closest_mass_index(metallicity_index, mass);
         assert_eq!(expected_index, index);
     }

@@ -2,12 +2,11 @@
 
 use std::ops::Index;
 
+use astro_units::mass::solar_mass;
 use uom::si::{
     f64::{Mass, Time},
     time::year,
 };
-
-use crate::units::*;
 
 use super::line::ParsecLine;
 
@@ -37,7 +36,7 @@ impl Trajectory {
     pub(super) fn new(params: Vec<ParsecLine>) -> Self {
         let initial_mass = match params.first() {
             Some(params) => params.mass,
-            None => Mass::new::<solar>(0.),
+            None => Mass::new::<solar_mass>(0.),
         };
         let lifetime = match params.last() {
             Some(last) => last.age,
