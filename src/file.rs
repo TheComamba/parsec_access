@@ -178,10 +178,8 @@ pub(crate) fn read_data_files(
         Ok(parsec_data)
     } else {
         let metallicity = METALLICITY_NAMES[metallicity_index];
-        Err(ParsecAccessError::DataNotAvailable(format!(
-            "Parsec Data for metallicity {} is empty.",
-            metallicity
-        )))
+        let message = format!("Parsec Data for metallicity {metallicity} is empty.");
+        Err(ParsecAccessError::DataNotAvailable(message))
     }
 }
 
