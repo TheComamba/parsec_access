@@ -43,7 +43,17 @@ fn download(metallicity_index: usize) -> Result<(), ParsecAccessError> {
 }
 
 fn read_trajectory_file(file_path: PathBuf) -> Result<Trajectory, ParsecAccessError> {
-    let file = File::open(file_path).map_err(ParsecAccessError::Io)?;
+    let file = match File::open(&file_path).map_err(ParsecAccessError::Io) {
+        Ok(file) => file,
+        Err(err) => {
+            let message = format!(
+                "Could not open trajectory file '{}': {err}",
+                file_path.display()
+            );
+            let io_err = std::io::Error::new(std::io::ErrorKind::NotFound, message);
+            return Err(ParsecAccessError::Io(io_err));
+        }
+    };
     let reader = BufReader::new(file);
     let mut lines = vec![];
     for line in reader.lines() {
@@ -168,10 +178,8 @@ pub(crate) fn read_data_files(
         Ok(parsec_data)
     } else {
         let metallicity = METALLICITY_NAMES[metallicity_index];
-        Err(ParsecAccessError::DataNotAvailable(format!(
-            "Parsec Data for metallicity {} is empty.",
-            metallicity
-        )))
+        let message = format!("Parsec Data for metallicity {metallicity} is empty.");
+        Err(ParsecAccessError::DataNotAvailable(message))
     }
 }
 

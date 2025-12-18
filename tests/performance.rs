@@ -1,7 +1,5 @@
-use parsec_access::{
-    getters::{get_closest_parameters, get_parameters, is_data_ready},
-    units::*,
-};
+use astro_units::mass::solar_mass;
+use parsec_access::getters::{get_closest_parameters, get_parameters, is_data_ready};
 use serial_test::serial;
 use uom::{
     fmt::DisplayStyle,
@@ -45,7 +43,7 @@ fn get_parameters_is_fast() {
     let elapsed = now.elapsed();
     println!(
         "Collected a total mass of {} solar masses.",
-        total_mass.into_format_args(solar, DisplayStyle::Abbreviation)
+        total_mass.into_format_args(solar_mass, DisplayStyle::Abbreviation)
     );
 
     println!(
@@ -64,7 +62,7 @@ fn get_closest_parameters_is_reasonably_fast() {
     const PRIME3: usize = 10061;
     const GRANULARITY: usize = 1000;
     const MAX_METALLICITY: f64 = 0.09;
-    let max_mass = Mass::new::<solar>(370.);
+    let max_mass = Mass::new::<solar_mass>(370.);
     let max_age = Time::new::<year>(15.0e9);
 
     assert!(is_data_ready());
@@ -91,7 +89,7 @@ fn get_closest_parameters_is_reasonably_fast() {
     let elapsed = now.elapsed();
     println!(
         "Collected a total mass of {} solar masses.",
-        total_mass.into_format_args(solar, DisplayStyle::Abbreviation)
+        total_mass.into_format_args(solar_mass, DisplayStyle::Abbreviation)
     );
 
     println!(

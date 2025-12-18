@@ -21,7 +21,9 @@ impl ParsecData {
         let data_dir = match get_data_dir() {
             Ok(dir) => dir,
             Err(err) => {
-                eprintln!("Error getting data directory: {}", err);
+                eprintln!(
+                    "Error getting data directory for metallicity index {metallicity_index}: {err}"
+                );
                 return ParsecData::default();
             }
         };
@@ -29,7 +31,7 @@ impl ParsecData {
         match result {
             Ok(data) => data,
             Err(err) => {
-                eprintln!("Error reading PARSEC data: {}", err);
+                eprintln!("Error reading PARSEC data for metallicity index {metallicity_index} from data dir '{}': {err}", data_dir.display());
                 ParsecData::default()
             }
         }

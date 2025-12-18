@@ -5,7 +5,9 @@
 
 cd $(git rev-parse --show-toplevel)
 
-dir="/home/simon/.local/share/parsec_access_0.1.0"
+package_version=$(cargo read-manifest | jq -r .version)
+
+dir="/home/simon/.local/share/parsec_access_$package_version"
 rm -rf $dir
 mkdir -p $dir
 find dev_data -type d -name "Z*" -exec cp -r {} $dir \;

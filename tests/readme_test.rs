@@ -5,7 +5,7 @@ fn readme_test() {
     use uom::si::f64::{Mass, Time};
     use uom::si::{length::kilometer, thermodynamic_temperature::kelvin};
     // The parsec_access crate introduces some custom units.
-    use parsec_access::units::*;
+    use astro_units::{mass::solar_mass, time::gigayear};
 
     if !is_data_ready() {
         // In your productive code, do some graceful error handling instead.
@@ -14,12 +14,12 @@ fn readme_test() {
 
     // The main use-case is mapping a metallicity, initial mass and age to other physical parameters.
     let metallicity_mass_fraction = 0.004;
-    let initial_mass = Mass::new::<solar>(1.8);
+    let initial_mass = Mass::new::<solar_mass>(1.8);
     let current_age = Time::new::<gigayear>(0.6);
     let parameters = get_closest_parameters(metallicity_mass_fraction, initial_mass, current_age);
     println!(
         "The star has a current mass of {} solar masses.",
-        parameters.mass.get::<solar>()
+        parameters.mass.get::<solar_mass>()
     );
     println!(
         "The star has a current temperature of {}.",

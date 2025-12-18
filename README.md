@@ -4,10 +4,11 @@ A Rust crate to access the [PARSEC database](https://people.sissa.it/~sbressan/C
 
 ## Usage
 
-In your `Cargo.toml`, include the `parsec_access` crate, and for almost all use cases, the `uom` crate:
+In your `Cargo.toml`, include the `parsec_access` crate, and for almost all use cases, the `uom` and `astro_units` crates:
 
 ```toml
 [dependencies]
+astro_units = "1.0"
 parsec_access = "1.0"
 uom = "0.36.0"
 ```
@@ -24,7 +25,7 @@ It is then lazily initialised, meaning it gets loaded into memory once you first
     use uom::si::f64::{Mass, Time};
     use uom::si::{length::kilometer, thermodynamic_temperature::kelvin};
     // The parsec_access crate introduces some custom units.
-    use parsec_access::units::*;
+    use astro_units::{mass::solar_mass, time::gigayear};
 
     if !is_data_ready() {
         // In your productive code, do some graceful error handling instead.
@@ -33,12 +34,12 @@ It is then lazily initialised, meaning it gets loaded into memory once you first
 
     // The main use-case is mapping a metallicity, initial mass and age to other physical parameters.
     let metallicity_mass_fraction = 0.004;
-    let initial_mass = Mass::new::<solar>(1.8);
+    let initial_mass = Mass::new::<solar_mass>(1.8);
     let current_age = Time::new::<gigayear>(0.6);
     let parameters = get_closest_parameters(metallicity_mass_fraction, initial_mass, current_age);
     println!(
         "The star has a current mass of {} solar masses.",
-        parameters.mass.get::<solar>()
+        parameters.mass.get::<solar_mass>()
     );
     println!(
         "The star has a current temperature of {}.",

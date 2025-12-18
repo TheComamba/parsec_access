@@ -1,5 +1,6 @@
 //! Provides a set of api functions exposing the main functionality of this crate.
 
+use astro_units::mass::solar_mass;
 use uom::si::{
     f64::{Mass, Time},
     time::year,
@@ -14,7 +15,6 @@ use crate::{
     data::ParsecData,
     line::ParsecLine,
     trajectory::Trajectory,
-    units::*,
 };
 
 /// Loads the Parsec data and makes sure that it is valid.
@@ -92,12 +92,12 @@ pub fn get_closest_data(mass_fraction: f64) -> &'static ParsecData {
 /// # Example
 /// ```
 /// use parsec_access::getters::{get_trajectory, is_data_ready};
-/// use parsec_access::units::*;
+/// use astro_units::mass::solar_mass;
 /// use uom::si::time::year;
 ///
 /// assert!(is_data_ready());
 /// let trajectory = get_trajectory(1, 2);
-/// assert!(trajectory.initial_mass.get::<solar>() > 0.);
+/// assert!(trajectory.initial_mass.get::<solar_mass>() > 0.);
 /// assert!(trajectory.lifetime.get::<year>() > 0.);
 /// ```
 pub fn get_trajectory(metallicity_index: usize, mass_index: usize) -> &'static Trajectory {
@@ -116,13 +116,13 @@ pub fn get_trajectory(metallicity_index: usize, mass_index: usize) -> &'static T
 /// # Example
 /// ```
 /// use parsec_access::getters::{get_closest_trajectory, is_data_ready};
-/// use parsec_access::units::*;
+/// use astro_units::mass::solar_mass;
 /// use uom::si::f64::Mass;
 ///
 /// assert!(is_data_ready());
-/// let trajectory = get_closest_trajectory(0.01, Mass::new::<solar>(1.));
-/// assert!(trajectory.initial_mass.get::<solar>() > 0.9);
-/// assert!(trajectory.initial_mass.get::<solar>() < 1.1);
+/// let trajectory = get_closest_trajectory(0.01, Mass::new::<solar_mass>(1.));
+/// assert!(trajectory.initial_mass.get::<solar_mass>() > 0.9);
+/// assert!(trajectory.initial_mass.get::<solar_mass>() < 1.1);
 /// ```
 pub fn get_closest_trajectory(mass_fraction: f64, mass: Mass) -> &'static Trajectory {
     let metallicity_index = get_closest_metallicity_index_from_mass_fraction(mass_fraction);
@@ -142,12 +142,12 @@ pub fn get_closest_trajectory(mass_fraction: f64, mass: Mass) -> &'static Trajec
 /// # Example
 /// ```
 /// use parsec_access::getters::{get_parameters, is_data_ready};
-/// use parsec_access::units::*;
+/// use astro_units::mass::solar_mass;
 /// use uom::si::{length::kilometer, thermodynamic_temperature::kelvin, time::year};
 ///
 /// assert!(is_data_ready());
 /// let parameters = get_parameters(1, 2, 3);
-/// assert!(parameters.mass.get::<solar>() > 0.);
+/// assert!(parameters.mass.get::<solar_mass>() > 0.);
 /// assert!(parameters.age.get::<year>() > 0.);
 /// assert!(parameters.luminosity_in_solar > 0.);
 /// assert!(parameters.temperature.get::<kelvin>() > 0.);
@@ -173,13 +173,13 @@ pub fn get_parameters(
 /// # Example
 /// ```
 /// use parsec_access::getters::{get_closest_parameters, is_data_ready};
-/// use parsec_access::units::*;
+/// use astro_units::{mass::solar_mass, time::gigayear};
 /// use uom::si::f64::{Mass, Time};
 ///
 /// assert!(is_data_ready());
-/// let parameters = get_closest_parameters(0.01, Mass::new::<solar>(1.), Time::new::<gigayear>(1.));
-/// assert!(parameters.mass > Mass::new::<solar>(0.9));
-/// assert!(parameters.mass < Mass::new::<solar>(1.1));
+/// let parameters = get_closest_parameters(0.01, Mass::new::<solar_mass>(1.), Time::new::<gigayear>(1.));
+/// assert!(parameters.mass > Mass::new::<solar_mass>(0.9));
+/// assert!(parameters.mass < Mass::new::<solar_mass>(1.1));
 /// assert!(parameters.age > Time::new::<gigayear>(0.9));
 /// assert!(parameters.age < Time::new::<gigayear>(1.1));
 /// ```
@@ -312,21 +312,21 @@ pub fn get_masses_in_solar(metallicity_index: usize) -> &'static [f64] {
 /// # Example
 /// ```
 /// use parsec_access::getters::{get_closest_mass_index, get_masses_in_solar};
-/// use parsec_access::units::*;
+/// use astro_units::mass::solar_mass;
 /// use uom::si::f64::Mass;
 ///
-/// let index = get_closest_mass_index(0, Mass::new::<solar>(1.));
+/// let index = get_closest_mass_index(0, Mass::new::<solar_mass>(1.));
 /// let expected = get_masses_in_solar(0)[index];
 /// assert!((expected-1.).abs() < 1e-8);
-/// let index = get_closest_mass_index(0, Mass::new::<solar>(0.));
+/// let index = get_closest_mass_index(0, Mass::new::<solar_mass>(0.));
 /// let expected = 0;
 /// assert_eq!(index, expected);
-/// let index = get_closest_mass_index(0, Mass::new::<solar>(1000.));
+/// let index = get_closest_mass_index(0, Mass::new::<solar_mass>(1000.));
 /// let expected = get_masses_in_solar(0).len() - 1;
 /// assert_eq!(index, expected);
 /// ```
 pub fn get_closest_mass_index(metallicity_index: usize, mass: Mass) -> usize {
-    get_closest_index(MASSES[metallicity_index], mass.get::<solar>())
+    get_closest_index(MASSES[metallicity_index], mass.get::<solar_mass>())
 }
 
 /// Returns a reference to the array of available ages in years.
@@ -369,7 +369,7 @@ pub fn get_ages_in_years(metallicity_index: usize, mass_index: usize) -> &'stati
 /// # Example
 /// ```
 /// use parsec_access::getters::{get_ages_in_years, get_closest_age_index, is_data_ready};
-/// use parsec_access::units::*;
+/// use astro_units::{mass::solar_mass, time::gigayear};
 /// use uom::si::f64::Time;
 /// use uom::si::time::year;
 ///

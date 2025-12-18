@@ -1,5 +1,6 @@
 //! Contains the `ParsecLine` struct, which holds the PARSEC data for a given metallicity, initial mass and age.
 
+use astro_units::mass::solar_mass;
 use uom::si::{
     f64::{Length, Mass, ThermodynamicTemperature, Time},
     length::kilometer,
@@ -7,7 +8,7 @@ use uom::si::{
     time::year,
 };
 
-use crate::{error::ParsecAccessError, units::*};
+use crate::error::ParsecAccessError;
 
 pub(super) struct RawParsecLine {
     mass: f64,
@@ -90,7 +91,7 @@ impl RawParsecLine {
         let centimeters = 10f64.powf(self.log_r);
         let kilometers = centimeters / 1e5;
         ParsecLine {
-            mass: Mass::new::<solar>(self.mass),
+            mass: Mass::new::<solar_mass>(self.mass),
             age: Time::new::<year>(self.age),
             luminosity_in_solar: 10f64.powf(self.log_l),
             temperature: ThermodynamicTemperature::new::<kelvin>(kelvins),
