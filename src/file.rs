@@ -35,8 +35,11 @@ fn download(metallicity_index: usize) -> Result<(), ParsecAccessError> {
         archive_name, data_dir
     );
     let target = PARSEC_URL.to_string() + archive_name;
-    let mut response = reqwest::blocking::get(target).map_err(ParsecAccessError::Connection)?;
-    let gz_decoder = GzDecoder::new(&mut response);
+    let mut response = ureq::get(target)
+        .call()
+        .map_err(ParsecAccessError::Connection)?;
+    let mut body = response.body_mut().as_reader();
+    let gz_decoder = GzDecoder::new(&mut body);
     let mut archive = Archive::new(gz_decoder);
     archive.unpack(data_dir).map_err(ParsecAccessError::Io)?;
     Ok(())

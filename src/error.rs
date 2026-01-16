@@ -6,7 +6,7 @@ use std::fmt;
 #[derive(Debug)]
 pub enum ParsecAccessError {
     /// An error occurred while trying to establish a connection to the Parsec server.
-    Connection(reqwest::Error),
+    Connection(ureq::Error),
     /// The requested data is not available.
     DataNotAvailable(String),
     /// An error occurred while trying to parse a glob pattern.
