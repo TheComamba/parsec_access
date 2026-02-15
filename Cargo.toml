@@ -8,7 +8,7 @@ license = "MIT"
 name = "parsec_access"
 readme = "README.md"
 repository = "https://github.com/TheComamba/ParsecAccess"
-version = "3.0.0"
+version = "3.1.0"
 
 [dependencies]
 astro_units = { version = "1.0", default-features = false, features = [] }
@@ -17,7 +17,7 @@ flate2 = { version = "1.0", default-features = false, features = ["rust_backend"
 glob = { version = "0.3.0", default-features = false } # File system traversal
 lazy_static = { version = "1.4", default-features = false }
 rayon = { version = "1.8", default-features = false } # Parallelism
-uom = { version = "0.36.0", default-features = false, features = ["f64", "si", "std"] } # Physical quantities
+uom = { version = "0.38.0", default-features = false, features = ["f64", "si", "std"] } # Physical quantities
 tar = { version = "0.4.0", default-features = false } # Decompression
 ureq = { version = "3.0", features = ["rustls"] }
 
