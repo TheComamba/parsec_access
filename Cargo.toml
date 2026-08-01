@@ -22,4 +22,4 @@ tar = { version = "0.4.0", default-features = false } # Decompression
 ureq = { version = "3.0", features = ["rustls"] }
 
 [dev-dependencies]
-serial_test = "3.0.0"
+serial_test = "4"
